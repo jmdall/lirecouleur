@@ -1,0 +1,8 @@
+Une extension pour aider à apprendre à lire.
+LireCouleur propose différentes fonctions :
+  - mise en évidence des sons par l'utilisation de couleurs
+  - segmentation des mots en syllabes
+  - mise en évidence des lettres muettes
+  - marquage des liaisons
+
+Auteur : Marie-Pierre Brungard
