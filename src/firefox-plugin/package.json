@@ -1,0 +1,17 @@
+{
+  "title": "WebLireCouleur",
+  "name": "weblirecouleur",
+  "id": "{ebab77cf-e530-46cd-86cc-25353a2ed0e0}",
+  "version": "1.1.0",
+  "description": "Une extension pour aider les personnes dyslexiques",
+  "main": "index.js",
+  "author": "Marie-Pierre Brungard",
+  "engines": {
+    "firefox": ">=37.0"
+  },
+  "icon": "icon.png",
+  "license": "LGPL",
+  "keywords": [
+    "lirecouleur","dyslexie"
+  ]
+}

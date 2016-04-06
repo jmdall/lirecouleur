@@ -1,0 +1,82 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html>
+	<head>
+	<script type="text/javascript" src="jquery.min.js"></script>
+	<script type="text/javascript" src="jqColorPicker.min.js"></script>
+	<script type="text/javascript" src="lirecouleur-cfg.js"></script>
+	<style type="text/css" media="all" id="lirecouleur_stylesheet">
+		body { text-align: center; font-family: sans-serif; background-color: #fff; }
+	</style>
+	<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+	</head>
+	
+	<body>
+		<h2>Configuration LireCouleur</h2>
+		<div style="margin-left:auto; margin-right:auto;">
+			<div style="vertical-align:top; display:inline-block; width: adjust;">
+				<table width="100%">
+					<tr>
+						<td colspan="3" style="text-align: right;">Taille police : <input type="hidden" id="fontSize"/>
+							<input type="image" src="plus.png" alt="plus" width="18" onclick="ajusterStyleStandard('fontSize', '+')"/>
+							<input type="image" src="moins.png" alt="moins" width="18" onclick="ajusterStyleStandard('fontSize', '-')"/>
+						</td>
+					</tr>
+					<tr>
+						<td colspan="3" style="text-align: right;">Hauteur de ligne : <input type="hidden" id="lineHeight"/>
+							<input type="image" src="plus.png" alt="plus" width="18" onclick="ajusterStyleStandard('lineHeight', '+')"/>
+							<input type="image" src="moins.png" alt="moins" width="18" onclick="ajusterStyleStandard('lineHeight', '-')"/>
+						</td>
+					</tr>
+					<tr>
+						<td colspan="3" style="text-align: right;">Espace entre mots : <input type="hidden" id="wordSpacing"/>
+							<input type="image" src="plus.png" alt="plus" width="18" onclick="ajusterStyleStandard('wordSpacing', '+')"/>
+							<input type="image" src="moins.png" alt="moins" width="18" onclick="ajusterStyleStandard('wordSpacing', '-')"/>
+						</td>
+					</tr>
+					<tr>
+						<td colspan="3">
+							<hr/>
+						</td>
+					</tr>
+					<tr><th>&nbsp;</th><th>texte</th><th>fond</th></tr>
+					<tr>
+						<td><span id="exemple_1" class="_lc_syll_0">syllabe 1</span></td>
+						<td><input type="image" src="clear.png" alt="effacer" width="18" onclick="effacer('fg', 1)"/><input class="color no-alpha" type="text" id="fg_1" size="9"/></td>
+						<td><input type="image" src="clear.png" alt="effacer" width="18" onclick="effacer('bg', 1)"/><input class="color no-alpha" type="text" id="bg_1" size="9"/></td>
+					</tr>
+					<tr>
+						<td><span id="exemple_2" class="_lc_syll_1">syllabe 2</span></td>
+						<td><input type="image" src="clear.png" alt="effacer" width="18" onclick="effacer('fg', 2)"/><input class="color no-alpha" type="text" id="fg_2" size="9"/></td>
+						<td><input type="image" src="clear.png" alt="effacer" width="18" onclick="effacer('bg', 2)"/><input class="color no-alpha" type="text" id="bg_2" size="9"/></td>
+					</tr>
+					<tr>
+						<td><span id="exemple_3" class="_lc_syll_2">syllabe 3</span></td>
+						<td><input type="image" src="clear.png" alt="effacer" width="18" onclick="effacer('fg', 3)"/><input class="color no-alpha" type="text" id="fg_3" size="9"/></td>
+						<td><input type="image" src="clear.png" alt="effacer" width="18" onclick="effacer('bg', 3)"/><input class="color no-alpha" type="text" id="bg_3" size="9"/></td>
+					</tr>
+					<tr>
+						<td><span id="exemple_4" class="_lc_lien">liens</span></td>
+						<td><input type="image" src="clear.png" alt="effacer" width="18" onclick="effacer('fg', 4)"/><input class="color no-alpha" type="text" id="fg_4" size="9"/></td>
+						<td><input type="image" src="clear.png" alt="effacer" width="18" onclick="effacer('bg', 4)"/><input class="color no-alpha" type="text" id="bg_4" size="9"/></td>
+					</tr>
+					<tr>
+						<td><span id="exemple_6" class="_lc_l_muettes">l. muettes</span></td>
+						<td><input type="image" src="clear.png" alt="effacer" width="18" onclick="effacer('fg', 6)"/><input class="color no-alpha" type="text" id="fg_6" size="9"/></td>
+						<td><input type="image" src="clear.png" alt="effacer" width="18" onclick="effacer('bg', 6)"/><input class="color no-alpha" type="text" id="bg_6" size="9"/></td>
+					</tr>
+					<tr><td colspan="3"><hr/></td></tr>
+					<tr>
+						<td colspan="3">
+							<input type="button" value="Ok" id="okButton" style="width: 100px"/>
+							&nbsp;
+							<input type="button" value="R&eacute;initialiser" id="resetButton" style="width: 100px"/>
+						</td>
+					</tr>
+				</table>
+			</div>
+			<div class="_lc_standard" style="text-align: left; vertical-align:top; display:inline-block; max-width: 50%; border:1px solid #ddd;">
+				<p><span><span class="_lc_syll_0">Chan</span><span class="_lc_syll_1">te</span></span>, <span><span class="_lc_syll_2">ô</span></span> <span><span class="_lc_syll_0">Mu</span><span class="_lc_syll_1">se</span></span>, <span><span class="_lc_syll_2">la</span></span> <span><span class="_lc_syll_0">co</span><span class="_lc_syll_1">lè</span><span class="_lc_syll_2">re</span></span> <span class="_lc_lien"><a href="#"><span class="_lc_syll_0">d’A</span><span class="_lc_syll_1">chi</span><span class="_lc_syll_2">lle</span></a></span>, <span><span class="_lc_syll_0">fil<span class="_lc_l_muettes">s</span></span></span> <span><span class="_lc_syll_1">de</span></span> <span><span class="_lc_syll_2">Pé</span><span class="_lc_syll_0">lé<span class="_lc_l_muettes">e</span></span></span>, <span><span class="_lc_syll_1">co</span><span class="_lc_syll_2">lè</span><span class="_lc_syll_0">re</span></span> <span><span class="_lc_syll_1">fu</span><span class="_lc_syll_2">nes</span><span class="_lc_syll_0">te</span></span>, <span><span class="_lc_syll_1">qui</span></span> <span><span class="_lc_syll_2">cau</span><span class="_lc_syll_0">sa</span></span> <span><span class="_lc_syll_1">tan<span class="_lc_l_muettes">t</span></span></span> <span><span class="_lc_syll_2">de</span></span> <span><span class="_lc_syll_0">ma</span><span class="_lc_syll_1">l<span class="_lc_l_muettes">h</span>eur<span class="_lc_l_muettes">s</span></span></span> <span><span class="_lc_syll_2">au<span class="_lc_l_muettes">x</span></span></span> <span><span class="_lc_syll_0">Grec<span class="_lc_l_muettes">s</span></span></span>, <span><span class="_lc_syll_1">qui</span></span> <span><span class="_lc_syll_2">pré</span><span class="_lc_syll_0">ci</span><span class="_lc_syll_1">pi</span><span class="_lc_syll_2">ta</span></span> <span><span class="_lc_syll_0">dan<span class="_lc_l_muettes">s</span></span></span> <span><span class="_lc_syll_1">les</span></span> <span><span class="_lc_syll_2">en</span><span class="_lc_syll_0">fer<span class="_lc_l_muettes">s</span></span></span> <span><span class="_lc_syll_1">les</span></span> <span><span class="_lc_syll_2">â</span><span class="_lc_syll_0">me<span class="_lc_l_muettes">s</span></span></span> <span><span class="_lc_syll_1">cou</span><span class="_lc_syll_2">ra</span><span class="_lc_syll_0">geu</span><span class="_lc_syll_1">se<span class="_lc_l_muettes">s</span></span></span> <span><span class="_lc_syll_2">de</span></span> <span><span class="_lc_syll_0">tan<span class="_lc_l_muettes">t</span></span></span> <span><span class="_lc_syll_1">de</span></span> <span><span class="_lc_syll_2"><span class="_lc_l_muettes">h</span>é</span><span class="_lc_syll_0">ro<span class="_lc_l_muettes">s</span></span></span>, <span><span class="_lc_syll_1">et</span></span> <span><span class="_lc_syll_2">ren</span><span class="_lc_syll_0">di<span class="_lc_l_muettes">t</span></span></span> <span><span class="_lc_syll_1">leur<span class="_lc_l_muettes">s</span></span></span> <span><span class="_lc_syll_2">cor<span class="_lc_l_muettes">p</span><span class="_lc_l_muettes">s</span></span></span> <span><span class="_lc_syll_0">la</span></span> <span><span class="_lc_syll_1">proi<span class="_lc_l_muettes">e</span></span></span> <span><span class="_lc_syll_2">des</span></span> <span><span class="_lc_syll_0">chien<span class="_lc_l_muettes">s</span></span></span> <span><span class="_lc_syll_1">et</span></span> <span><span class="_lc_syll_2">des</span></span> <span><span class="_lc_syll_0">vau</span><span class="_lc_syll_1">tour<span class="_lc_l_muettes">s</span></span></span>.</p>
+			</div>
+		</div>
+	</body>
+</html>
