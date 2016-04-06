@@ -1,0 +1,16 @@
+Modifications :
+* modification du décodage des phonèmes "oin" : /w in/ et non plus /u/in/ (un seul et non plus 2)
+* rationalisation des décodages de "oeu" comme "oe" avec comme exceptions noeud, boeufs, oeufs, voeux
+
+Nouveautés :
+* différence faite entre le "w" (semi-voyelle) et le "oi" et le "oin" (voyelles)
+* Colorie les mots en alternant les couleurs
+* Coloriage des syllabes dynamiquement avec suivi grâce aux flèches du clavier
+
+Corrections :
+* correction du décodage de "oignon", "roy" et "royaume"
+
+Reste à voir :
+* 
+
+------------------------- 3.4.3------------------------- 

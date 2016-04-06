@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Extension files were created by Extension Compiler - version 1.5.2 -->
+<description xmlns="http://openoffice.org/extensions/description/2006"
+ xmlns:dep="http://openoffice.org/extensions/description/2006"
+ xmlns:xlink="http://www.w3.org/1999/xlink" >
+	<identifier value="LireCouleur" />
+	<version value="3.5.0" />
+	<icon>
+		<default xlink:href="images/caterpillar_16.png" />
+	</icon>
+	<extension-description>
+		<src xlink:href="Descriptions/descr-fr.txt" lang="fr"/>
+	</extension-description>
+	<dependencies>
+		<OpenOffice.org-minimal-version value="4" dep:name="OpenOffice.org 4 minimal"/>
+	</dependencies>
+	<registration>
+		<simple-license accept-by="admin" suppress-on-update="true" >
+			<license-text xlink:href="Legal/license-fr.txt" lang="fr" />
+		</simple-license>
+	</registration>
+	<update-information>
+		<src xlink:href="http://www.arkaline.fr/downloads/LireCouleur_AOO4.update.xml" />
+	</update-information>
+	<display-name>
+		<name lang="fr">LireCouleur : outils d&apos;aide à l&apos;apprentissage de la lecture</name>
+		<name lang="en">LireCouleur : tools to support the study of reading the french language</name>
+	</display-name>
+</description>
