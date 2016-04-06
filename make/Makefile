@@ -27,6 +27,20 @@ tests : ../src/opendocument-plugin/pythonpath/lirecouleur.py ../src/opendocument
 	cp ../src/opendocument-plugin/lirecouleur.dic ../tests/
 	python ../tests/tests_lirecouleur.py
 
+cleanweb:
+	rm ../src/firefox-plugin/data/jquery.min.js
+	rm ../src/firefox-plugin/data/jqColorPicker.min.js
+	rm ../src/web/js/jquery.min.js
+	rm ../src/web/js/jquery-ui.min.js
+	rm ../src/web/js/js.cookie.js
+	rm ../src/web/js/jquery.ui.touch-punch.min.js
+	rm ../src/web/js/evol.colorpicker.min.js
+	rm ../src/web/js/iosCheckbox.min.js
+	rm ../src/web/css/evol.colorpicker.min.css
+	rm ../src/web/css/iosCheckbox.css
+	rm ../src/web/css/jquery-ui.min.css
+	rm ../src/firefox-plugin/data/lirecouleur.js
+
 web :
 	cp ../src/vendors/js/jquery.min.js ../src/firefox-plugin/data/
 	cp ../src/vendors/js/jqColorPicker.min.js ../src/firefox-plugin/data/
@@ -39,3 +53,4 @@ web :
 	cp ../src/vendors/css/evol.colorpicker.min.css ../src/web/css/
 	cp ../src/vendors/css/iosCheckbox.css ../src/web/css/
 	cp ../src/vendors/css/jquery-ui.min.css ../src/web/css/
+	cp ../src/web/js/lirecouleur.js ../src/firefox-plugin/data/
