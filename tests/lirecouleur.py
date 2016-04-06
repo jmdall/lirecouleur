@@ -6,7 +6,7 @@
 # en syllabes.
 #
 # @author Marie-Pierre Brungard
-# @version 3.4.3
+# @version 3.5
 # @since 2015
 #
 # GNU General Public Licence (GPL) version 3
@@ -38,6 +38,8 @@ import logging
 import sys
 import codecs
 
+# configuration du niveau de log (DEBUG = le plus bas niveau ; CRITICAL = le plus haut niveau)
+#logging.basicConfig(level = logging.INFO, format="%(asctime)s - %(funcName)s - %(lineno)d - %(levelname)s : %(message)s")
 
 """
 	Dictionnaire de décodage de mots particuliers
@@ -51,7 +53,7 @@ __dico_deco__ = None
 """
 sampa2lc = {'p':'p', 'b':'b', 't':'t', 'd':'d', 'k':'k', 'g':'g', 'f':'f', 'v':'v',
 's':'s', 'z':'z', 'S':'s^', 'Z':'g^', 'j':'j', 'm':'m', 'n':'n', 'J':'g~',
-'N':'n~', 'l':'l', 'R':'r', 'w':'w', 'H':'y', 'i':'i', 'e':'e', 'E':'e^',
+'N':'n~', 'l':'l', 'R':'r', 'w':'wa', 'H':'y', 'i':'i', 'e':'e', 'E':'e^',
 'a':'a', 'A':'a', 'o':'o', 'O':'o_ouvert', 'u':'u', 'y':'y', '2':'x^', '9':'x',
 '@':'q', 'e~':'e~', 'a~':'a~', 'o~':'o~', '9~':'x~', '#':'#'}
 
@@ -100,7 +102,7 @@ def handleMaskPhonems():
 	for k in syllaphon['c']:
 		selectphonemes[k] = 0
 
-	for k in ['o_comp','e_comp','e^_comp','a~','e~','x~','o~','x','x^','w']:
+	for k in ['o_comp','e_comp','e^_comp','a~','e~','x~','o~','x','x^','w','wa', 'w5']:
 		selectphonemes[k] = 0
 
 	# read the file content
@@ -450,10 +452,10 @@ def u(txt):
 ###################################################################################
 syllaphon = {
 	'v':['a','q','q_caduc','i','o','o_comp','o_ouvert','u','y','e','e_comp','e^',
-	'e^_comp','a~','e~','x~','o~','x','x^','w'],
+	'e^_comp','a~','e~','x~','o~','x','x^','wa', 'w5'],
 	'c':['p','t','k','b','d','g','f','f_ph','s','s^','v','z','z^','l','r','m','n',
 	'k_qu','z^_g','g_u','s_c','s_t','z_s','ks','gz'],
-	's':['j','g~','n~'],
+	's':['j','g~','n~','w'],
 	'#':['#','verb_3p']
 }
 
@@ -556,7 +558,7 @@ u('présenter')]
 # 	sert à savoir si la séquence 'ient' se prononce [i][#] ou [j][e~]
 ###################################################################################
 def regle_ient(mot, pos_mot):
-	m = re.match('[bcdfghjklnmpqrstvwxz]ient', mot[-5:])
+	m = re.match(u('[bcçdfghjklnmpqrstvwxz]ient'), mot[-5:])
 	if m == None or (pos_mot < len(mot[:-4])):
 		# le mot ne se termine pas par 'ient' (précédé d'une consonne)
 		# ou alors on est en train d'étudier une lettre avant la terminaison en 'ient'
@@ -746,10 +748,10 @@ def regle_s_final(mot, pos_mot):
 def regle_t_final(mot, pos_mot):
 	mots_t_final = ['accessit','cet','but','diktat','kumquat','prurit','affidavit','dot','rut','audit',
 	'exeat','magnificat','satisfecit','azimut','exit','mat','scorbut','brut',
-	'fiat','mazout','sinciput','cajeput','granit','net','internet','transat','sept','vingt',
+	'fiat','mazout','sinciput','cajeput','granit','net','internet','transat','sept',
 	'chut','huit','obit','transit',u('coït'),'incipit','occiput','ut','comput',
 	u('introït'),'pat','zut',u('déficit'),'inuit',u('prétérit'),
-	'gadget','kilt','scout','fret']
+	'gadget','kilt','kit','scout','fret']
 
 	# prendre le mot au singulier uniquement
 	m_sing = mot
@@ -815,342 +817,353 @@ def regle_tien(mot, pos_mot):
 #
 ###################################################################################
 autom = {
-		'a' : [['u','il','in','nc_ai_fin','ai_fin','i','n','m','nm','y_except','y'],
-				{'n':[u('+[u("n[bcdfgjklmpqrstvwxzç]")]'),'a~',2],
-				'm':[u('+[u("m[bcdfgjklpqrstvwxzç]")]'),'a~',2], # toute consonne sauf le n
-				'nm':['+["[nm]$"]','a~',2],
-				'y_except':['-["(^b|cob|cip)"];+["y"]','a',1], # exception : baye, cobaye
-				'y':['+["y"]','e^_comp',1],
-				'u':['+["u"]','o_comp',2],
-				'il':['+["il($|l)"]','a',1],
-				'in':['+["i[nm]([bcdfghjklnmpqrstvwxz]|$)"]','e~',3], # toute succession 'ain' 'aim' suivie d'une consonne ou d'une fin de mot
-				'nc_ai_fin':[regle_nc_ai_final,'e^_comp',2],
-				'ai_fin':[u('+["i$"]'),'e_comp',2],
-				'i':[u('+[u("[iî]")]'),'e^_comp',2],
-				'*':['','a',1]}],
-		u('â') : [[],
-				{'*':['','a',1]}],
-		u('à') : [[],
-				{'*':['','a',1]}],
-		'b' : [['b','plomb'],
-				{'b':['+["b"]','b',2],
-				'plomb':['-["plom"];+["(s?)$"]','#',1], # le "b" à la fin de plomb ne se prononce pas
-				'*':['','b',1]}],
-		'c' : [['eiy','choeur_1','choeur_2','chor','psycho','brachio','cheo','chest','chiro','chlo_chlam','chr',
-				'h','erc_orc','cisole','c_muet_fin','onc_donc','nc_muet_fin','_spect','_inct','cciey','cc','apostrophe'],
-				{'choeur_1':[u('+["hoe"]'),'k',2],
-				'choeur_2':[u('+[u("hœ")]'),'k',2],
-				'chor':[u('+["hor"]'),'k',2], # tous les "choral, choriste"... exceptions non traitées : chorizo, maillechort
-				'psycho':[u('-["psy"];+["ho"]'),'k',2], # tous les "psycho" quelque chose
-				'brachio':[u('-["bra"];+["hio"]'),'k',2], # brachiosaure, brachiocéphale
-				'cheo':[u('+[u("héo")]'),'k',2], # archéo..., trachéo...
-				'chest':[u('+[u("hest")]'),'k',2], # orchestre et les mots de la même famille
-				'chiro':[u('+["hiro[p|m]"]'),'k',2], # chiroptère, chiromancie
-				'chlo_chlam':[u('+["hl(o|am)"]'),'k',2], # chlorure, chlamyde
-				'chr':[u('+["hr"]'),'k',2], # de chrétien à synchronisé
-				'h':['+["h"]','s^',2],
-				'eiy':[u('+[u("[eiyéèêëîï]")]'),'s_c',1],
-				'cisole':['+["$"];-["^"]','s_c',1], # exemple : c'est
-				'erc_orc':['-["[e|o]r"];+["(s?)$"]','#',1], # clerc, porc,
-				'c_muet_fin':['-["taba|accro"];+["(s?)$"]','#',1], # exceptions traitées : tabac, accroc
-				'onc_donc':['-["^on|^don"]','k',1], # non exceptions traitées : onc, donc
-				'nc_muet_fin':['-["n"];+["(s?)$"]','#',1], # exceptions traitées : tous les mots terminés par *nc
-				'_spect':['-["spe"];+["t(s?)$"]','#',1], # respect, suspect, aspect
-				'_inct':['-["in"];+["t(s?)$"]','#',1], # instinct, succinct, distinct
-				'cciey':[u('+[u("c[eiyéèêëîï]")]'),'k',1], # accident, accepter, coccyx
-				'cc':['+["c"]','k',2], # accorder, accompagner
-				'apostrophe':['+["@"]','s',2], # apostrophe
-				'*':['','k',1], '@':['','k',1]}],
-	 # + tous les *nc sauf "onc" et "donc"
-		u('ç') : [[],
-				{'*':['','s',1]}],
-		'd' : [['d','aujourdhui','disole','dmuet','apostrophe'],
-				{'d':['+["d"]','d',2],
-				'aujourdhui':['-["aujour"]','d',1], # aujourd'hui
-				'disole':['+["$"];-["^"]','d',1], # exemple : d'abord
-				'dmuet':['+["(s?)$"]','#',1], # un d suivi éventuellement d'un s ex. : retards
-				'apostrophe':['+["@"]','d',2], # apostrophe
-				'*':['','d',1]}],
-		'e' : [['conj_v_ier','uient','ien','een','except_en','_ent','clef','hier','adv_emment_fin',
-				'ment','imparfait','verbe_3_pluriel','au',
-				'avoir','monsieur','jeudi','jeu_','eur','eu','eu_accent_circ','in','eil','y','iy','ennemi','enn_debut_mot','dessus_dessous',
-				'et','cet','t_final','eclm_final','est','drz_final','n','adv_emment_a','femme','lemme','em_gene','nm','tclesmesdes',
-				'que_isole','que_gue_final','jtcnslemede','jean','ge','eoi','ex','reqquechose','2consonnes','abbaye','e_muet','e_caduc','e_deb'],
-				{'_ent':[regle_mots_ent,'a~',2], # quelques mots (adverbes ou noms) terminés par ent
-				'adv_emment_fin':['-["emm"];+["nt"]','a~',2], # adverbe avec 'emment' => se termine par le son [a~]
-				'ment':[regle_ment,'a~',2], # on considère que les mots terminés par 'ment' se prononcent [a~] sauf s'il s'agit d'un verbe
-				'imparfait':['-["ai"];+["nt$"]','verb_3p',3], # imparfait à la 3ème personne du pluriel
-				'verbe_3_pluriel':['+["nt$"]','q_caduc',1], # normalement, pratiquement tout le temps verbe à la 3eme personne du pluriel
-				'clef':['-["cl"];+["f"]','e_comp',2], # une clef
-				'hier':[regle_er,'e^_comp',1], # encore des exceptions avec les mots terminés par 'er' prononcés 'R'
-				'n':[u('+[u("n[bcdfghjklmpqrstvwxzç]")]'),'a~',2],
-				'adv_emment_a':['+["mment"]','a',1], # adverbe avec 'emment' => son [a]
-				'eclm_final':['+["[clm](s?)$"]','e^_comp',1], # donne le son [e^] et le l ou le c se prononcent (ex. : miel, sec)
-				'femme':['-["f"];+["mm"]','a',1], # femme et ses dérivés => son [a]
-				'lemme':['-["l"];+["mm"]','e^_comp',1], # lemme et ses dérivés => son [e^]
-				'em_gene':['+["m[bcdfghjklmnpqrstvwxz]"]','a~',2], # 'em' cas général => son [a~]
-				'uient':[u('-["ui"];+["nt$"]'),'#',3], # enfuient, appuient, fuient, ennuient, essuient
-				'conj_v_ier':[regle_ient,'#',3], # verbe du 1er groupe terminé par 'ier' conjugué à la 3ème pers du pluriel
-				'except_en':[u('-[u("exam|mino|édu")];+["n(s?)$"]'),'e~',2], # exceptions des mots où le 'en' final se prononce [e~] (héritage latin)
-				'een':[u('-[u("é")];+["n(s?)$"]'),'e~',2], # les mots qui se terminent par 'éen'
-				'ien':['-["[bdlmrstvh]i"];+["n([bcdfghjklpqrstvwxz]|$)"]','e~',2], # certains mots avec 'ien' => son [e~]
-				'nm':['+["[nm]$"]','a~',2],
-				'drz_final':['+["[drz](s?)$"]','e_comp',2], # e suivi d'un d,r ou z en fin de mot done le son [e]
-				'que_isole':['-["^qu"];+["$"]','q',1], # que isolé
-				'que_gue_final':['-["[gq]u"];+["(s?)$"]','q_caduc',1], # que ou gue final
-				'jtcnslemede':['-["^[jtcnslmd]"];+["$"]','q',1], # je, te, me, le, se, de, ne
-				'tclesmesdes':['-["^[tcslmd]"];+["s$"]', ConstLireCouleur.MESTESSESLESDESCES[handleMaskCountry()], 2], # mes, tes, ces, ses, les
-				'in':['+["i[nm]([bcdfghjklnmpqrstvwxz]|$)"]','e~',3], # toute succession 'ein' 'eim' suivie d'une consonne ou d'une fin de mot
-				'avoir':[regle_avoir,'y',2],
-				'monsieur':['-["si"];+["ur"]','x^',2],
-				'jeudi':['-["j"];+["udi"]','x^',2], # jeudi
-				'jeu_':['-["j"];+["u"]','x',2], # tous les "jeu*" sauf jeudi
-				'eur':['+["ur"]','x',2],
-				'eu':['+["u"]','x',2],
-				'eu_accent_circ':[u('+[u("û")]'),'x^',2],
-				'est':['-["^"];+["st$"]','e^_comp',3],
-				'et':['-["^"];+["t$"]','e_comp',2],
-				'eil':['+["il"]','e^_comp',1],
-				'y':[u('+[u("y[aeiouéèêààäôâ]")]'),'e^_comp',1],
-				'iy':['+["[iy]"]','e^_comp',2],
-				'cet':['-["^c"];+["[t]$"]','e^_comp',1], # 'cet'
-				't_final':['+["[t]$"]','e^_comp',2], # donne le son [e^] et le t ne se prononce pas
-				'au':['+["au"]','o_comp',3],
-				'ennemi':['-["^"];+["nnemi"]','e^_comp',1], # ennemi est l'exception ou 'enn' en début de mot se prononce 'èn' (cf. enn_debut_mot)
-				'enn_debut_mot':['-["^"];+["nn"]','a~',2], # 'enn' en début de mot se prononce 'en'
-				'ex':['+["x"]','e^',1], # e suivi d'un x se prononce è
-				'reqquechose':['-["r"];+["[bcdfghjklmnpqrstvwxz](h|l|r)"]','q',1], # re-quelque chose : le e se prononce 'e'
-				'dessus_dessous':['-["d"];+["ss(o?)us"]','q',1], # dessus, dessous : 'e' = e
-				'2consonnes':['+["[bcdfghjklmnpqrstvwxz][bcdfghjklmnpqrstvwxz]"]','e^_comp',1], # e suivi de 2 consonnes se prononce è
-				'e_deb':['-["^"]','q',1], # par défaut, un 'e' en début de mot se prononce [q]
-				'abbaye':['-["abbay"];+["(s?)$"]','#',1], # ben oui...
-				'e_muet':[u('-[u("[aeiouéèêà]")];+["(s?)$"]'),'#',1], # un e suivi éventuellement d'un 's' et précédé d'une voyelle ou d'un 'g' ex. : pie, geai
-				'jean':['-["j"];+["an"]','#',1], # jean
-				'ge':[u('-["g"];+[u("[aouàäôâ]")]'),'#',1], # un e précédé d'un 'g' et suivi d'une voyelle ex. : cageot
-				'eoi':[u('+["oi"]'),'#',1], # un e suivi de 'oi' ex. : asseoir
-				'e_caduc':['-["[bcdfghjklmnpqrstvwxzy]"];+["(s?)$"]','q_caduc',1], # un e suivi éventuellement d'un 's' et précédé d'une consonne ex. : correctes
-				'*':['','q',1],
-				'@':['','#',1]
-				}],
-		u('é') : [[],
-				{'*':['','e',1]}],
-		u('è') : [[],
-				{'*':['','e^',1]}],
-		u('ê') : [[],
-				{'*':['','e^',1]}],
-		u('ë') : [[],
-				{'*':['','e^',1]}],
-		'f' : [['f'],
-				{'f':['+["f"]','f',2], '*':['','f',1]}],
-		'g' : [['g','ao','eiy','aiguille','u_consonne','u','n','vingt','g_muet_oin',
-				'g_muet_our','g_muet_an','g_muet_fin'],
-				{'g':['+["g"]','g',2],
-				'n':['+["n"]','n~',2],
-				'ao':['+["a","o"]','g',1],
-				'eiy':[u('+[u("[eéèêëïiy]")]'),'z^_g',1], # un 'g' suivi de e,i,y se prononce [z^]
-				'g_muet_oin':['-["oi(n?)"]','#',1], # un 'g' précédé de 'oin' ou de 'oi' ne se prononce pas ; ex. : poing, doigt
-				'g_muet_our':['-["ou(r)"]','#',1], # un 'g' précédé de 'our' ou de 'ou(' ne se prononce pas ; ex. : bourg
-				'g_muet_an':[u('-[u("(s|^ét|^r)an")];+["(s?)$"]'),'#',1], # sang, rang, étang
-				'g_muet_fin':[u('-["lon|haren"]'),'#',1], # pour traiter les exceptions : long, hareng
-				'aiguille':['-["ai"];+["u"]','g',1], # encore une exception : aiguille et ses dérivés
-				'vingt':['-["vin"];+["t"]','#',1], # vingt
-				'u_consonne':['+["u[bcdfghjklmnpqrstvwxz]"]','g',1], # gu suivi d'une consonne se prononce [g][y]
-				'u':['+["u"]','g_u',2],
-				'*':['','g',1]}],
-		'h' : [[],
-				{'*':['','#',1]}],
-		'i' : [['ing','n','m','nm','lldeb','vill','mill','tranquille',
-				'ill','@ill','@il','ll','ui','ient','ie','i_voyelle'],
-				{'ing':['-["[bcdfghjklmnpqrstvwxz]"];+["ng$"]','i',1],
-				'n':[u('+[u("n[bcdfghjklmpqrstvwxzç]")]'),'e~',2],
-				'm':[u('+[u("m[bcdfghjklnpqrstvwxzç]")]'),'e~',2],
-				'nm':['+["[n|m]$"]','e~',2],
-				'lldeb':['-["^"];+["ll"]','i',1],
-				'vill':['-["v"];+["ll"]','i',1],
-				'mill':['-["m"];+["ll"]','i',1],
-				'tranquille':['-["tranqu"];+["ll"]','i',1],
-				'ill':['+["ll"];-["[bcdfghjklmnpqrstvwxz](u?)"]','i',1], # précédé éventuellement d'un u et d'une consonne, donne le son [i]
-				'@ill':['-["[aeo]"];+["ll"]','j',3], # par défaut précédé d'une voyelle et suivi de 'll' donne le son [j]
-				'@il':['-["[aeou]"];+["l(s?)$"]','j',2], # par défaut précédé d'une voyelle et suivi de 'l' donne le son [j]
-				'll':['+["ll"]','j',3], # par défaut avec ll donne le son [j]
-				'ui':['-["u"];+["ent"]','i',1], # essuient, appuient
-				'ient':[regle_ient,'i',1], # règle spécifique pour différencier les verbes du premier groupe 3ème pers pluriel
-				'ie':['+["e(s?)$"]','i',1], # mots terminés par -ie(s)
-				'i_voyelle':[u('+[u("[aäâeéèêëoôöuù]")]'),'j',1], #i suivi d'une voyelle donne [j]
-				'*':['','i',1]}],
-		u('ï') : [[],
-				{'*':['','i',1]}],
-		u('î') : [[],
-				{'*':['','i',1]}],
-		'j' : [[],
-				{'*':['','z^',1]}],
-		'k' : [[],
-				{'*':['','k',1]}],
-		'l' : [['vill','mill','tranquille','illdeb','ill','eil','ll','excep_il', 'apostrophe','lisole'],
-				{'vill':['-["^vi"];+["l"]','l',2], # ville, village etc. => son [l]
-				'mill':['-["^mi"];+["l"]','l',2], # mille, million, etc. => son [l]
-				'tranquille':['-["tranqui"];+["l"]','l',2], # tranquille => son [l]
-				'illdeb':['-["^i"];+["l"]','l',2], # 'ill' en début de mot = son [l] ; exemple : illustration
-				'lisole':['+["$"];-["^"]','l',1], # exemple : l'animal
-				'ill':['-[".i"];+["l"]','j',2], # par défaut, 'ill' donne le son [j]
-				'll':['+["l"]','l',2], # à défaut de l'application d'une autre règle, 'll' donne le son [l]
-				'excep_il':['-["fusi|outi|genti"];+["(s?)$"]','#',1], # les exceptions trouvées ou le 'l' à la fin ne se prononce pas : fusil, gentil, outil
-				'eil':['-["e(u?)i"]','j',1], # les mots terminés en 'eil' ou 'ueil' => son [j]
-				'apostrophe':['+["@"]','l',2], # apostrophe
-				'*':['','l',1]}],
-		'm' : [['m','tomn','misole','apostrophe'],
-				{'m':['+["m"]','m',2],
-				'tomn':['-["to"];+["n"]','#',1], # regle spécifique pour 'automne' et ses dérivés
-				'*':['','m',1],
-				'misole':['+["$"];-["^"]','m',1], # exemple : m'a
-				'apostrophe':['+["@"]','m',2] # apostrophe
-				}],
-		'n' : [['ing','n','ment','urent','irent','erent','ent','nisole','apostrophe'],
-				{'n':['+["n"]','n',2],
-				'ment':[regle_verbe_mer,'verb_3p',2], # on considère que les verbent terminés par 'ment' se prononcent [#]
-				'urent':['-["ure"];+["t$"]','verb_3p',2], #verbes avec terminaisons en -urent
-				'irent':['-["ire"];+["t$"]','verb_3p',2], #verbes avec terminaisons en -irent
-				'erent':[u('-[u("ère")];+["t$"]'),'verb_3p',2], #verbes avec terminaisons en -èrent
-				'ent':['-["e"];+["t$"]','verb_3p',2],
-				'ing':['-["i"];+["g$"]','g~',2],
-				'*':['','n',1],
-				'nisole':['+["$"];-["^"]','n',1], # exemple : n'a
-				'apostrophe':['+["@"]','n',2] # apostrophe
-				}],
-		'o' : [['in','i','tomn','monsieur','n','m','nm','y','u','o','oeu','oe_0','oe_1','oe_2', 'oe_3','oe_4'],
-				{'in':['+["i[nm]"]','u',1],
-				'i':[u('+[u("(i|î)")]'),'w',2],
-				'u':[u('+[u("[uwûù]")]'),'u',2], # son [u] : clou, clown
-				'tomn':['-["t"];+["mn"]','o',1], # regle spécifique pour 'automne' et ses dérivés
-				'monsieur':['-["m"];+["nsieur"]','q',2],
-				'n':[u('+[u("n[bcdfgjklmpqrstvwxzç]")]'),'o~',2],
-				'm':[u('+[u("m[bcdfgjklpqrstvwxzç]")]'),'o~',2], # toute consonne sauf le m
-				'nm':['+["[nm]$"]','o~',2],
-				'y':['+["y"]','w',1],
-				'o':['+["o"]','o',2], # exemple : zoo
-				'oeu':['+["eu"]','x^',3], # exemple : oeuf
-				'oe_0':[u('+[u("ê")]'),'w',2],
-				'oe_1':['-["c"];+["e"]','o',1], # exemple : coefficient
-				'oe_2':['-["m"];+["e"]','w',2], # exemple : moelle
-				'oe_3':['-["f"];+["e"]','e',2], # exemple : foetus
-				'oe_4':['+["e"]','x',2], # exemple : oeil
-				'*':['','o',1]}],
-		u('œ') : [['oeil'],
-				{'oeil':['+["il"]','x',1],
-				'*':['+["u"]','x^',2]}],
-		u('ô') : [[],
-				{'*':['','o',1]}],
-		u('ö') : [[],
-				{'*':['','o',1]}],
-		'p' : [['h','oup','drap','trop','sculpt','sirop','sgalop','rps','amp','compt','bapti','sept','p'],
-				{'p':['+["p"]','p',2],
-				'oup':['-["[cl]ou"];+["$"]','#',1], # les exceptions avec un p muet en fin de mot : loup, coup
-				'amp':['-["c(h?)am"];+["$"]','#',1], # les exceptions avec un p muet en fin de mot : camp, champ
-				'drap':['-["dra"];+["$"]','#',1], # les exceptions avec un p muet en fin de mot : drap
-				'trop':['-["tro"];+["$"]','#',1], # les exceptions avec un p muet en fin de mot : trop
-				'sculpt':['-["scul"];+["t"]','#',1], # les exceptions avec un p muet : sculpter et les mots de la même famille
-				'sirop':['-["siro"];+["$"]','#',1], # les exceptions avec un p muet en fin de mot : sirop
-				'sept':['-["^se"];+["t(s?)$"]','#',1], # les exceptions avec un p muet en fin de mot : sept
-				'sgalop':['-["[gs]alo"];+["$"]','#',1], # les exceptions avec un p muet en fin de mot : galop
-				'rps':['-["[rm]"];+["s$"]','#',1], # les exceptions avec un p muet en fin de mot : corps, camp
-				'compt':['-["com"];+["t"]','#',1], # les exceptions avec un p muet : les mots en *compt*
-				'bapti':['-["ba"];+["ti"]','#',1], # les exceptions avec un p muet : les mots en *bapti*
-				'h':['+["h"]','f_ph',2],
-				'*':['','p',1]}],
-		'q' : [['qu','k'],
-				{'qu':['+["u[bcdfgjklmnpqrstvwxz]"]','k',1],
-				'k':['+["u"]','k_qu',2],
-				'*':['','k',1]}],
-		'r' : [['monsieur','messieurs','gars','r'],
-				{'monsieur':['-["monsieu"]','#',1],
-				'messieurs':['-["messieu"]','#',1],
-				'r':['+["r"]','r',2],
-				'gars':['+["s"];-["ga"]','#',2], # gars
-				'*':['','r',1]}],
-		's' : [['sch','s_final','parasit','para','mars','s','z','sisole','smuet','apostrophe'],
-				{'sch':['+["ch"]','s^',3], # schlem
-				's_final':[regle_s_final,'s',1], # quelques mots terminés par -us, -is, -os, -as
-				'z':[u('-[u("[aeiyouéèàüûùëöêîô]")];+[u("[aeiyouéèàüûùëöêîô]")]'),'z_s',1], #un s entre 2 voyelles se prononce [z]
-				'parasit':['-["para"];+["it"]','z_s',1], # parasit*
-				'para':['-["para"]','s',1], # para quelque chose (parasol, parasismique, ...)
-				's':['+["s"]','s',2], # un s suivi d'un autre s se prononce [s]
-				'sisole':['+["$"];-["^"]','s',1], # exemple : s'approche
-				'mars':['+["$"];-["mar"]','s',1], # mars
-				'smuet':['-["(e?)"];+["$"]','#',1], # un s en fin de mot éventuellement précédé d'un e ex. : correctes
-				'apostrophe':['+["@"]','s',2], # apostrophe
-				'*':['','s',1],
-				'@':['','#',1]}],
-		't' : [['t','tisole','except_tien','_tien','cratie','tion',
-				'ourt','_inct','_spect','_ct','_est','t_final','tmuet','apostrophe'],
-				{'t':['+["t"]','t',2],
-				'except_tien':[regle_tien,'t',1], # quelques mots où 'tien' se prononce [t]
-				'_tien':['+["ien"]','s_t',1],
-				'cratie':['-["cra"];+["ie"]','s_t',1],
-				'vingt':['-["ving"]','t',1], # vingt
-				'tion':['+["ion"]','s_t',1],
-				'tisole':['+["$"];-["^"]','t',1], # exemple : demande-t-il
-				'ourt':['-["(a|h|g)our"];+["$"]','t',1], # exemple : yaourt, yoghourt, yogourt
-				'_est':['-["es"];+["(s?)$"]','t',1], # test, ouest, brest, west, zest, lest
-				'_inct':['-["inc"];+["(s?)$"]','#',1], # instinct, succinct, distinct
-				'_spect':['-["spec"];+["(s?)$"]','#',1], # respect, suspect, aspect
-				'_ct':['-["c"];+["(s?)$"]','t',1], # tous les autres mots terminés par 'ct'
-				't_final':[regle_t_final,'t',1], # quelques mots où le "t" final se prononce
-				'tmuet':['+["(s?)$"]','#',1], # un t suivi éventuellement d'un s ex. : marrants
-				'*':['','t',1],
-				'apostrophe':['+["@"]','t',2], # apostrophe
-				'@':['','#',1]}],
-		'u' : [['um','n','nm','ueil'],
-				{'um':['-["[^aefo]"];+["m$"]','o',1],
-				'n':['+["n[bcdfghjklmpqrstvwxz]"]','x~',2],
-				'nm':['+["[nm]$"]','x~',2],
-				'ueil':['+["eil"]','x',2], # mots terminés en 'ueil' => son [x^]
-				'*':['','y',1]}],
-		u('û') : [[],
-				{'*':['','y',1]}],
-		u('ù') : [[],
-				{'*':['','y',1]}],
-		'v' : [[],
-				{'*':['','v',1]}],
-		'w' : [['wapiti','kiwi','sandwich'],
-				{'wapiti':['+["apiti"]','w',1],
-				'kiwi':['-["ki"];+["i"]','w',1],
-				'sandwich':['+["ich"]','w',1],
-				'*':['','v',1]}],
-		'x' : [['six_dix','gz_1','gz_2','gz_3','gz_4','gz_5','_aeox','fix','_ix'],
-				{'six_dix':['-["(s|d)i"]','s_x',1],
-				'gz_1':[u('-["^"];+[u("[aeiouéèàüëöêîôûù]")]'),'gz',1], # mots qui commencent par un x suivi d'une voyelle
-				'gz_2':[u('-[u("^(h?)e")];+[u("[aeiouéèàüëöêîôûù]")]'),'gz',1], # mots qui commencent par un 'ex' ou 'hex' suivi d'une voyelle
-				'gz_3':[u('-[u("^coe")];+[u("[aeiouéèàüëöêîôûù]")]'),'gz',1], # mots qui commencent par un 'coex' suivi d'une voyelle
-				'gz_4':[u('-[u("^ine")];+[u("[aeiouéèàüëöêîôûù]")]'),'gz',1], # mots qui commencent par un 'inex' suivi d'une voyelle
-				'gz_5':[u('-[u("^(p?)rée")];+[u("[aeiouéèàüëöêîôûù]")]'),'gz',1], # mots qui commencent par un 'réex' ou 'préex' suivi d'une voyelle
-				'_aeox':['-["[aeo]"]','ks',1],
-				'fix':['-["fi"]','ks',1],
-				'_ix':[u('-[u("(remi|obéli|astéri|héli|phéni|féli)")]'),'ks',1],
-				'*':['','ks',1],
-				'@':['','#',1]}],
-		'y' : [['m','n','nm','abbaye','y_voyelle'],
-				{'y_voyelle':[u('+[u("[aeiouéèàüëöêîôûù]")]'),'j',1], # y suivi d'une voyelle donne [j]
-				'abbaye':['-["abba"];+["e"]', 'i', 1], # abbaye... bien irrégulier
-				'n':['+["n[bcdfghjklmpqrstvwxz]"]','e~',2],
-				'm':['+["m[mpb]"]','e~',2],
-				'nm':['+["[n|m]$"]','e~',2],
-				'*':['','i',1]}],
-		'z' : [['riz', 'iz', 'gaz'],
-				{'riz':['-["i"];+["$"]','#',1], # y suivi d'une voyelle donne [j]
-				'iz':['-["i"];+["$"]','z',1],
-				'gaz':['-["a"];+["$"]','z',1],
-				'*':['','z',1],
-				'@':['','#',1]}],
-		'\'' : [[],
-				{'*':['','#',1],
-				'@':['','#',1]}],
-		'@' : [[],
-				{'*':['','#',1],
-				'@':['','#',1]}],
-		'_' : [[],
-				{'*':['','#',1],
-				'@':['','#',1]}]
-		}
+	'a' : [['u','il','in','nc_ai_fin','ai_fin','i','n','m','nm','y_except','y'],
+			{'n':[{'+':u(r"n[bcçdfgjklmpqrstvwxz]")},'a~',2],
+			'm':[{'+':u(r"m[bcçdfgjklpqrstvwxz]")},'a~',2], ## toute consonne sauf le n
+			'nm':[{'+':r"[nm]$"},'a~',2],
+			'y_except':[{'-':r"(^b|cob|cip)",'+':r"y"},'a',1], ## exception : baye, cobaye
+			'y':[{'+':r"y"},'e^_comp',1],
+			'u':[{'+':r"u"},'o_comp',2],
+			'il':[{'+':r"il($|l)"},'a',1],
+			'in':[{'+':u(r"i[nm]([bcçdfghjklnmpqrstvwxz]|$)")},'e~',3], ## toute succession 'ain' 'aim' suivie d'une consonne ou d'une fin de mot
+			'nc_ai_fin':[regle_nc_ai_final,'e^_comp',2],
+			'ai_fin':[{'+':r"i$"},'e_comp',2],
+			'i':[{'+':u(r"[iî]")},'e^_comp',2],
+			'*':[{},'a',1]}],
+	u('â') : [[],
+			{'*':[{},'a',1]}],
+	u('à') : [[],
+			{'*':[{},'a',1]}],
+	'b' : [['b','plomb'],
+			{'b':[{'+':r"b"},'b',2],
+			'plomb':[{'-':r"plom",'+':r"(s?)$"},'#',1], ## le "b" à la fin de plomb ne se prononce pas
+			'*':[{},'b',1]}],
+	'c' : [['eiy','choeur_1','choeur_2','chor','psycho','brachio','cheo','chest','chiro','chlo_chlam','chr',
+			'h','erc_orc','cisole','c_muet_fin','onc_donc','nc_muet_fin','_spect','_inct','cciey','cc','apostrophe'],
+			{'choeur_1':[{'+':r"hoe"},'k',2],
+			'choeur_2':[{'+':u(r"hœ")},'k',2],
+			'chor':[{'+':r"hor"},'k',2], ## tous les "choral, choriste"... exceptions non traitées : chorizo, maillechort
+			'psycho':[{'-':r"psy",'+':r"ho"},'k',2], ## tous les "psycho" quelque chose
+			'brachio':[{'-':r"bra",'+':r"hio"},'k',2], ## brachiosaure, brachiocéphale
+			'cheo':[{'+':u(r"héo")},'k',2], ## archéo..., trachéo...
+			'chest':[{'+':r"hest"},'k',2], ## orchestre et les mots de la même famille
+			'chiro':[{'+':r"hiro[p|m]"},'k',2], ## chiroptère, chiromancie
+			'chlo_chlam':[{'+':r"hl(o|am)"},'k',2], ## chlorure, chlamyde
+			'chr':[{'+':r"hr"},'k',2], ## de chrétien à synchronisé
+			'h':[{'+':r"h"},'s^',2],
+			'eiy':[{'+':u(r"[eiyéèêëîï]")},'s_c',1],
+			'cisole':[{'+':r"$",'-':r"^"},'s_c',1], ## exemple : c'est
+			'erc_orc':[{'-':r"[e|o]r",'+':r"(s?)$"},'#',1], ## clerc, porc,
+			'c_muet_fin':[{'-':r"taba|accro",'+':r"(s?)$"},'#',1], ## exceptions traitées : tabac, accroc
+			'onc_donc':[{'-':r"^on|^don"},'k',1], ## non exceptions traitées : onc, donc
+			'nc_muet_fin':[{'-':r"n",'+':r"(s?)$"},'#',1], ## exceptions traitées : tous les mots terminés par *nc
+			'_spect':[{'-':r"spe",'+':r"t(s?)$"},'#',1], ## respect, suspect, aspect
+			'_inct':[{'-':r"in",'+':r"t(s?)$"},'#',1], ## instinct, succinct, distinct
+			'cciey':[{'+':u(r"c[eiyéèêëîï]")},'k',1], ## accident, accepter, coccyx
+			'cc':[{'+':r"c"},'k',2], ## accorder, accompagner
+			'apostrophe':[{'+':r"(\'|\’)"},'s',2], ## apostrophe
+			'*':[{},'k',1], '@':['','k',1]}],
+ ## + tous les *nc sauf "onc" et "donc"
+	u('ç') : [[],
+			{'*':[{},'s',1]}],
+	'd' : [['d','aujourdhui','disole','dmuet','apostrophe'],
+			{'d':[{'+':r"d"},'d',2],
+			'aujourdhui':[{'-':r"aujour"},'d',1], ## aujourd'hui
+			'disole':[{'+':r"$",'-':r"^"},'d',1], ## exemple : d'abord
+			'dmuet':[{'+':r"(s?)$"},'#',1], ## un d suivi éventuellement d'un s ex. : retards
+			'apostrophe':[{'+':r"(\'|\’)"},'d',2], ## apostrophe
+			'*':[{},'d',1]}],
+	'e' : [['conj_v_ier','uient','ien','een','except_en','_ent','clef','hier','adv_emment_fin',
+			'ment','imparfait','verbe_3_pluriel','au',
+			'avoir','monsieur','jeudi','jeu_','eur','eu','eu_accent_circ','in','eil','y','iy','ennemi','enn_debut_mot','dessus_dessous',
+			'et','cet','t_final','eclm_final','est','drz_final','n','adv_emment_a','femme','lemme','em_gene','nm','tclesmesdes',
+			'que_isole','que_gue_final','jtcnslemede','jean','ge','eoi','ex','reqquechose','2consonnes','abbaye','e_muet','e_caduc','e_deb'],
+			{'_ent':[regle_mots_ent,'a~',2], ## quelques mots (adverbes ou noms) terminés par ent
+			'adv_emment_fin':[{'-':r"emm",'+':r"nt"},'a~',2], ## adverbe avec 'emment' => se termine par le son [a~]
+			'ment':[regle_ment,'a~',2], ## on considère que les mots terminés par 'ment' se prononcent [a~] sauf s'il s'agit d'un verbe
+			'imparfait':[{'-':r"ai",'+':r"nt$"},'verb_3p',3], ## imparfait à la 3ème personne du pluriel
+			'verbe_3_pluriel':[{'+':r"nt$"},'q_caduc',1], ## normalement, pratiquement tout le temps verbe à la 3eme personne du pluriel
+			'clef':[{'-':r"cl",'+':r"f"},'e_comp',2], ## une clef
+			'hier':[regle_er,'e^_comp',1], ## encore des exceptions avec les mots terminés par 'er' prononcés 'R'
+			'n':[{'+':u(r"n[bcçdfghjklmpqrstvwxz]")},'a~',2],
+			'adv_emment_a':[{'+':r"mment"},'a',1], ## adverbe avec 'emment' => son [a]
+			'eclm_final':[{'+':r"[clm](s?)$"},'e^_comp',1], ## donne le son [e^] et le l ou le c se prononcent (ex. : miel, sec)
+			'femme':[{'-':r"f",'+':r"mm"},'a',1], ## femme et ses dérivés => son [a]
+			'lemme':[{'-':r"l",'+':r"mm"},'e^_comp',1], ## lemme et ses dérivés => son [e^]
+			'em_gene':[{'+':u(r"m[bcçdfghjklmnpqrstvwxz]")},'a~',2], ## 'em' cas général => son [a~]
+			'uient':[{'-':r"ui",'+':r"nt$"},'#',3], ## enfuient, appuient, fuient, ennuient, essuient
+			'conj_v_ier':[regle_ient,'#',3], ## verbe du 1er groupe terminé par 'ier' conjugué à la 3ème pers du pluriel
+			'except_en':[{'-':u(r"exam|mino|édu"),'+':r"n(s?)$"},'e~',2], ## exceptions des mots où le 'en' final se prononce [e~] (héritage latin)
+			'een':[{'-':u(r"é"),'+':r"n(s?)$"},'e~',2], ## les mots qui se terminent par 'éen'
+			'ien':[{'-':r"[bdlmrstvh]i",'+':u(r"n([bcçdfghjklpqrstvwxz]|$)")},'e~',2], ## certains mots avec 'ien' => son [e~]
+			'nm':[{'+':r"[nm]$"},'a~',2],
+			'drz_final':[{'+':r"[drz](s?)$"},'e_comp',2], ## e suivi d'un d,r ou z en fin de mot done le son [e]
+			'que_isole':[{'-':r"^qu",'+':r"$"},'q',1], ## que isolé
+			'que_gue_final':[{'-':r"[gq]u",'+':r"(s?)$"},'q_caduc',1], ## que ou gue final
+			'jtcnslemede':[{'-':r"^[jtcnslmd]",'+':r"$"},'q',1], ## je, te, me, le, se, de, ne
+			'tclesmesdes':[{'-':r"^[tcslmd]",'+':r"s$"},'e_comp', 2], ## mes, tes, ces, ses, les
+			'in':[{'+':u(r"i[nm]([bcçdfghjklnmpqrstvwxz]|$)")},'e~',3], ## toute succession 'ein' 'eim' suivie d'une consonne ou d'une fin de mot
+			'avoir':[regle_avoir,'y',2],
+			'monsieur':[{'-':r"si",'+':r"ur"},'x^',2],
+			'jeudi':[{'-':r"j",'+':r"udi"},'x^',2], ## jeudi
+			'jeu_':[{'-':r"j",'+':r"u"},'x',2], ## tous les "jeu*" sauf jeudi
+			'eur':[{'+':r"ur"},'x',2],
+			'eu':[{'+':r"u"},'x',2],
+			'eu_accent_circ':[{'+':u(r"û")},'x^',2],
+			'est':[{'-':r"^",'+':r"st$"},'e^_comp',3],
+			'et':[{'-':r"^",'+':r"t$"},'e_comp',2],
+			'eil':[{'+':r"il"},'e^_comp',1],
+			'y':[{'+':u(r"y[aeiouéèêààäôâ]")},'e^_comp',1],
+			'iy':[{'+':r"[iy]"},'e^_comp',2],
+			'cet':[{'-':r"^c",'+':r"[t]$"},'e^_comp',1], ## 'cet'
+			't_final':[{'+':r"[t]$"},'e^_comp',2], ## donne le son [e^] et le t ne se prononce pas
+			'au':[{'+':r"au"},'o_comp',3],
+			'ennemi':[{'-':r"^",'+':r"nnemi"},'e^_comp',1], ## ennemi est l'exception ou 'enn' en début de mot se prononce 'èn' (cf. enn_debut_mot)
+			'enn_debut_mot':[{'-':r"^",'+':r"nn"},'a~',2], ## 'enn' en début de mot se prononce 'en'
+			'ex':[{'+':r"x"},'e^',1], ## e suivi d'un x se prononce è
+			'reqquechose':[{'-':r"r",'+':u(r"[bcçdfghjklmnpqrstvwxz](h|l|r)")},'q',1], ## re-quelque chose : le e se prononce 'e'
+			'dessus_dessous':[{'-':r"d",'+':r"ss(o?)us"},'q',1], ## dessus, dessous : 'e' = e
+			'2consonnes':[{'+':u(r"[bcçdfghjklmnpqrstvwxz]{2}")},'e^_comp',1], ## e suivi de 2 consonnes se prononce è
+			'e_deb':[{'-':r"^"},'q',1], ## par défaut, un 'e' en début de mot se prononce [q]
+			'abbaye':[{'-':r"abbay",'+':r"(s?)$"},'#',1], ## ben oui...
+			'e_muet':[{'-':u(r"[aeiouéèêà]"),'+':r"(s?)$"},'#',1], ## un e suivi éventuellement d'un 's' et précédé d'une voyelle ou d'un 'g' ex. : pie, geai
+			'jean':[{'-':r"j",'+':r"an"},'#',1], ## jean
+			'ge':[{'-':r"g",'+':u(r"[aouàäôâ]")},'#',1], ## un e précédé d'un 'g' et suivi d'une voyelle ex. : cageot
+			'eoi':[{'+':r"oi"},'#',1], ## un e suivi de 'oi' ex. : asseoir
+			'e_caduc':[{'-':u(r"[bcçdfghjklmnpqrstvwxzy]"),'+':r"(s?)$"},'q_caduc',1], ## un e suivi éventuellement d'un 's' et précédé d'une consonne ex. : correctes
+			'*':[{},'q',1],
+			'@':['','q_caduc',1]
+			}],
+	u('é') : [[],
+			{'*':[{},'e',1]}],
+	u('è') : [[],
+			{'*':[{},'e^',1]}],
+	u('ê') : [[],
+			{'*':[{},'e^',1]}],
+	u('ë') : [[],
+			{'*':[{},'e^',1]}],
+	'f' : [['f','oeufs'],
+			{'f':[{'+':r"f"},'f',2],
+			 'oeufs':[{'-':u(r"(oeu|œu)"),'+':r"s"},'#',1], ## oeufs et boeufs
+			 '*':[{},'f',1]}],
+	'g' : [['g','ao','eiy','aiguille','u_consonne','u','n','vingt','g_muet_oin',
+			'g_muet_our','g_muet_an','g_muet_fin'],
+			{'g':[{'+':r"g"},'g',2],
+			'n':[{'+':r"n"},'n~',2],
+			'ao':[{'+':r"a|o"},'g',1],
+			'eiy':[{'+':u(r"[eéèêëïiy]")},'z^_g',1], ## un 'g' suivi de e,i,y se prononce [z^]
+			'g_muet_oin':[{'-':r"oi(n?)"},'#',1], ## un 'g' précédé de 'oin' ou de 'oi' ne se prononce pas ; ex. : poing, doigt
+			'g_muet_our':[{'-':r"ou(r)"},'#',1], ## un 'g' précédé de 'our' ou de 'ou(' ne se prononce pas ; ex. : bourg
+			'g_muet_an':[{'-':r"(s|^ét|^r)an",'+':r"(s?)$"},'#',1], ## sang, rang, étang
+			'g_muet_fin':[{'-':r"lon|haren"},'#',1], ## pour traiter les exceptions : long, hareng
+			'aiguille':[{'-':r"ai",'+':r"u"},'g',1], ## encore une exception : aiguille et ses dérivés
+			'vingt':[{'-':r"vin",'+':r"t"},'#',1], ## vingt
+			'u_consonne':[{'+':u(r"u[bcçdfghjklmnpqrstvwxz]")},'g',1], ## gu suivi d'une consonne se prononce [g][y]
+			'u':[{'+':r"u"},'g_u',2],
+			'*':[{},'g',1]}],
+	'h' : [[],
+			{'*':[{},'#',1]}],
+	'i' : [['ing','n','m','nm','lldeb','vill','mill','tranquille',
+			'ill','@ill','@il','ll','ui','ient_1','ient_2','ie','i_voyelle'],
+			{'ing':[{'-':u(r"[bcçdfghjklmnpqrstvwxz]"),'+':r"ng$"},'i',1],
+			'n':[{'+':u(r"n[bcçdfghjklmpqrstvwxz]")},'e~',2],
+			'm':[{'+':u(r"m[bcçdfghjklnpqrstvwxz]")},'e~',2],
+			'nm':[{'+':r"[n|m]$"},'e~',2],
+			'lldeb':[{'-':r"^",'+':r"ll"},'i',1],
+			'vill':[{'-':r"v",'+':r"ll"},'i',1],
+			'mill':[{'-':r"m",'+':r"ll"},'i',1],
+			'tranquille':[{'-':r"tranqu",'+':r"ll"},'i',1],
+			'ill':[{'+':r"ll",'-':u(r"[bcçdfghjklmnpqrstvwxz](u?)")},'i',1], ## précédé éventuellement d'un u et d'une consonne, donne le son [i]
+			'@ill':[{'-':r"[aeo]",'+':r"ll"},'j',3], ## par défaut précédé d'une voyelle et suivi de 'll' donne le son [j]
+			'@il':[{'-':r"[aeou]",'+':r"l(s?)$"},'j',2], ## par défaut précédé d'une voyelle et suivi de 'l' donne le son [j]
+			'll':[{'+':r"ll"},'j',3], ## par défaut avec ll donne le son [j]
+			'ui':[{'-':r"u",'+':r"ent"},'i',1], ## essuient, appuient
+			'ient_1':[regle_ient,'i',1], ## règle spécifique pour différencier les verbes du premier groupe 3ème pers pluriel
+			'ient_2':[{'+':r"ent(s)?$"},'j',1], ## si la règle précédente ne fonctionne pas
+			'ie':[{'+':r"e(s)?$"},'i',1], ## mots terminés par -ie(s|nt)
+			'i_voyelle':[{'+':u(r"[aäâeéèêëoôöuù]")},'j',1], ## i suivi d'une voyelle donne [j]
+			'*':[{},'i',1]}],
+	u('ï') : [[],
+			{'*':[{},'i',1]}],
+	u('î') : [[],
+			{'*':[{},'i',1]}],
+	'j' : [[],
+			{'*':[{},'z^',1]}],
+	'k' : [[],
+			{'*':[{},'k',1]}],
+	'l' : [['vill','mill','tranquille','illdeb','ill','eil','ll','excep_il', 'apostrophe','lisole'],
+			{'vill':[{'-':r"^vi",'+':r"l"},'l',2], ## ville, village etc. => son [l]
+			'mill':[{'-':r"^mi",'+':r"l"},'l',2], ## mille, million, etc. => son [l]
+			'tranquille':[{'-':r"tranqui",'+':r"l"},'l',2], ## tranquille => son [l]
+			'illdeb':[{'-':r"^i",'+':r"l"},'l',2], ## 'ill' en début de mot = son [l] ; exemple : illustration
+			'lisole':[{'+':r"$",'-':r"^"},'l',1], ## exemple : l'animal
+			'ill':[{'-':r".i",'+':r"l"},'j',2], ## par défaut, 'ill' donne le son [j]
+			'll':[{'+':r"l"},'l',2], ## à défaut de l'application d'une autre règle, 'll' donne le son [l]
+			'excep_il':[{'-':r"fusi|outi|genti",'+':r"(s?)$"},'#',1], ## les exceptions trouvées ou le 'l' à la fin ne se prononce pas : fusil, gentil, outil
+			'eil':[{'-':r"e(u?)i"},'j',1], ## les mots terminés en 'eil' ou 'ueil' => son [j]
+			'apostrophe':[{'+':r"(\'|\’)"},'l',2], ## apostrophe
+			'*':[{},'l',1]}],
+	'm' : [['m','tomn','misole','apostrophe'],
+			{'m':[{'+':r"m"},'m',2],
+			'tomn':[{'-':r"to",'+':r"n"},'#',1], ## regle spécifique pour 'automne' et ses dérivés
+			'*':[{},'m',1],
+			'misole':[{'+':r"$",'-':r"^"},'m',1], ## exemple : m'a
+			'apostrophe':[{'+':r"(\'|\’)"},'m',2] ## apostrophe
+			}],
+	'n' : [['ing','n','ment','urent','irent','erent','ent','nisole','apostrophe'],
+			{'n':[{'+':r"n"},'n',2],
+			'ment':[regle_verbe_mer,'verb_3p',2], ## on considère que les verbent terminés par 'ment' se prononcent [#]
+			'urent':[{'-':r"ure",'+':r"t$"},'verb_3p',2], ## verbes avec terminaisons en -urent
+			'irent':[{'-':r"ire",'+':r"t$"},'verb_3p',2], ## verbes avec terminaisons en -irent
+			'erent':[{'-':u(r"ère"),'+':r"t$"},'verb_3p',2], ## verbes avec terminaisons en -èrent
+			'ent':[{'-':r"e",'+':r"t$"},'verb_3p',2],
+			'ing':[{'-':r"i",'+':r"g$"},'g~',2],
+			'*':[{},'n',1],
+			'nisole':[{'+':r"$",'-':r"^"},'n',1], ## exemple : n'a
+			'apostrophe':[{'+':r"(\'|\’)"},'n',2] ## apostrophe
+			}],
+	'o' : [['in','oignon','i','tomn','monsieur','n','m','nm','y1','y2','u','o','oe_0','oe_1','oe_2', 'oe_3','voeux','oeufs','noeud','oeu_defaut','oe_defaut'],
+			{'in':[{'+':r"i[nm]"},'w5',3],
+			'oignon':[{'-':r"^",'+':r"ignon"},'o',2],
+			'i':[{'+':u(r"(i|î)")},'wa',2],
+			'u':[{'+':u(r"[uwûù]")},'u',2], ## son [u] : clou, clown
+			'tomn':[{'-':r"t",'+':r"mn"},'o',1], ## regle spécifique pour 'automne' et ses dérivés
+			'monsieur':[{'-':r"m",'+':r"nsieur"},'q',2],
+			'n':[{'+':u(r"n[bcçdfgjklmpqrstvwxz]")},'o~',2],
+			'm':[{'+':u(r"m[bcçdfgjklpqrstvwxz]")},'o~',2], ## toute consonne sauf le m
+			'nm':[{'+':r"[nm]$"},'o~',2],
+			'y1':[{'+':r"y$"},'wa',2],
+			'y2':[{'+':r"y"},'wa',1],
+			'o':[{'+':r"o"},'o',2], ## exemple : zoo
+			'voeux':[{'+':r"eux"},'x^',3], ## voeux
+			'noeud':[{'+':r"eud"},'x^',3], ## noeud
+			'oeufs':[{'+':r"eufs"},'x^',3], ## traite oeufs et boeufs
+			'oeu_defaut':[{'+':r"eu"},'x',3], ## exemple : oeuf
+			'oe_0':[{'+':u(r"ê")},'wa',2],
+			'oe_1':[{'-':r"c",'+':r"e"},'o',1], ## exemple : coefficient
+			'oe_2':[{'-':r"m",'+':r"e"},'wa',2], ## exemple : moelle
+			'oe_3':[{'-':r"f",'+':r"e"},'e',2], ## exemple : foetus
+			'oe_defaut':[{'+':r"e"},'x',2], ## exemple : oeil
+			'*':[{},'o',1]}],
+	u('œ') : [['voeux','oeufs','noeud'],
+			{'voeux':[{'+':r"ux"},'x^',2], ## voeux
+			'noeud':[{'+':r"ud"},'x^',2], ## noeud
+			'oeufs':[{'+':r"ufs"},'x^',2], ## traite oeufs et boeufs
+			'*':[{'+':r"u"},'x^',2]}],
+	u('ô') : [[],
+			{'*':[{},'o',1]}],
+	u('ö') : [[],
+			{'*':[{},'o',1]}],
+	'p' : [['h','oup','drap','trop','sculpt','sirop','sgalop','rps','amp','compt','bapti','sept','p'],
+			{'p':[{'+':r"p"},'p',2],
+			'oup':[{'-':r"[cl]ou",'+':r"$"},'#',1], ## les exceptions avec un p muet en fin de mot : loup, coup
+			'amp':[{'-':r"c(h?)am",'+':r"$"},'#',1], ## les exceptions avec un p muet en fin de mot : camp, champ
+			'drap':[{'-':r"dra",'+':r"$"},'#',1], ## les exceptions avec un p muet en fin de mot : drap
+			'trop':[{'-':r"tro",'+':r"$"},'#',1], ## les exceptions avec un p muet en fin de mot : trop
+			'sculpt':[{'-':r"scul",'+':r"t"},'#',1], ## les exceptions avec un p muet : sculpter et les mots de la même famille
+			'sirop':[{'-':r"siro",'+':r"$"},'#',1], ## les exceptions avec un p muet en fin de mot : sirop
+			'sept':[{'-':r"^se",'+':r"t(s?)$"},'#',1], ## les exceptions avec un p muet en fin de mot : sept
+			'sgalop':[{'-':r"[gs]alo",'+':r"$"},'#',1], ## les exceptions avec un p muet en fin de mot : galop
+			'rps':[{'-':r"[rm]",'+':r"s$"},'#',1], ## les exceptions avec un p muet en fin de mot : corps, camp
+			'compt':[{'-':r"com",'+':r"t"},'#',1], ## les exceptions avec un p muet : les mots en *compt*
+			'bapti':[{'-':r"ba",'+':r"ti"},'#',1], ## les exceptions avec un p muet : les mots en *bapti*
+			'h':[{'+':r"h"},'f_ph',2],
+			'*':[{},'p',1]}],
+	'q' : [['qu','k'],
+			{'qu':[{'+':r"u[bcçdfgjklmnpqrstvwxz]"},'k',1],
+			'k':[{'+':r"u"},'k_qu',2],
+			'*':[{},'k',1]}],
+	'r' : [['monsieur','messieurs','gars','r'],
+			{'monsieur':[{'-':r"monsieu"},'#',1],
+			'messieurs':[{'-':r"messieu"},'#',1],
+			'r':[{'+':r"r"},'r',2],
+			'gars':[{'+':r"s",'-':r"ga"},'#',2], ## gars
+			'*':[{},'r',1]}],
+	's' : [['sch','h','s_final','parasit','para','mars','s','z','sisole','smuet','apostrophe'],
+			{'sch':[{'+':r"ch"},'s^',3], ## schlem
+			'h':[{'+':r"h"},'s^',2],
+			's_final':[regle_s_final,'s',1], ## quelques mots terminés par -us, -is, -os, -as
+			'z':[{'-':u(r"[aeiyouéèàüûùëöêîô]"),'+':u(r"[aeiyouéèàüûùëöêîô]")},'z_s',1], ## un s entre 2 voyelles se prononce [z]
+			'parasit':[{'-':r"para",'+':r"it"},'z_s',1], ## parasit*
+			'para':[{'-':r"para"},'s',1], ## para quelque chose (parasol, parasismique, ...)
+			's':[{'+':r"s"},'s',2], ## un s suivi d'un autre s se prononce [s]
+			'sisole':[{'+':r"$",'-':r"^"},'s',1], ## exemple : s'approche
+			'mars':[{'+':r"$",'-':r"mar"},'s',1], ## mars
+			'smuet':[{'-':r"(e?)",'+':r"$"},'#',1], ## un s en fin de mot éventuellement précédé d'un e ex. : correctes
+			'apostrophe':[{'+':r"(\'|\’)"},'s',2], ## apostrophe
+			'*':[{},'s',1],
+			'@':[{},'#',1]}],
+	't' : [['t','tisole','except_tien','_tien','cratie','vingt','tion',
+			'ourt','_inct','_spect','_ct','_est','t_final','tmuet','apostrophe'],
+			{'t':[{'+':r"t"},'t',2],
+			'except_tien':[regle_tien,'t',1], ## quelques mots où 'tien' se prononce [t]
+			'_tien':[{'+':r"ien"},'s_t',1],
+			'cratie':[{'-':r"cra",'+':r"ie"},'s_t',1],
+			'vingt':[{'-':r"ving",'+':r"$"},'t',1], ## vingt mais pas vingts
+			'tion':[{'+':r"ion"},'s_t',1],
+			'tisole':[{'+':r"$",'-':r"^"},'t',1], ## exemple : demande-t-il
+			'ourt':[{'-':r"(a|h|g)our",'+':r"$"},'t',1], ## exemple : yaourt, yoghourt, yogourt
+			'_est':[{'-':r"es",'+':r"(s?)$"},'t',1], ## test, ouest, brest, west, zest, lest
+			'_inct':[{'-':r"inc",'+':r"(s?)$"},'#',1], ## instinct, succinct, distinct
+			'_spect':[{'-':r"spec",'+':r"(s?)$"},'#',1], ## respect, suspect, aspect
+			'_ct':[{'-':r"c",'+':r"(s?)$"},'t',1], ## tous les autres mots terminés par 'ct'
+			't_final':[regle_t_final,'t',1], ## quelques mots où le "t" final se prononce
+			'tmuet':[{'+':r"(s?)$"},'#',1], ## un t suivi éventuellement d'un s ex. : marrants
+			'*':[{},'t',1],
+			'apostrophe':[{'+':r"(\'|\’)"},'t',2], ## apostrophe
+			'@':[{},'#',1]}],
+	'u' : [['um','n','nm','ueil'],
+			{'um':[{'-':r"[^aefo]",'+':r"m$"},'o',1],
+			'n':[{'+':u(r"n[bcçdfghjklmpqrstvwxz]")},'x~',2],
+			'nm':[{'+':r"[nm]$"},'x~',2],
+			'ueil':[{'+':r"eil"},'x',2], ## mots terminés en 'ueil' => son [x^]
+			'*':[{},'y',1]}],
+	u('û') : [[],
+			{'*':[{},'y',1]}],
+	u('ù') : [[],
+			{'*':[{},'y',1]}],
+	'v' : [[],
+			{'*':[{},'v',1]}],
+	'w' : [['wapiti','kiwi','sandwich'],
+			{'wapiti':[{'+':r"apiti"},'w',1],
+			'kiwi':[{'-':r"ki",'+':r"i"},'w',1],
+			'sandwich':[{'+':r"ich"},'w',1],
+			'*':[{},'v',1]}],
+	'x' : [['six_dix','gz_1','gz_2','gz_3','gz_4','gz_5','_aeox','fix','_ix'],
+			{'six_dix':[{'-':r"(s|d)i"},'s_x',1],
+			'gz_1':[{'-':r"^",'+':u(r"[aeiouéèàüëöêîôûù]")},'gz',1], ## mots qui commencent par un x suivi d'une voyelle
+			'gz_2':[{'-':r"^(h?)e",'+':u(r"[aeiouéèàüëöêîôûù]")},'gz',1], ## mots qui commencent par un 'ex' ou 'hex' suivi d'une voyelle
+			'gz_3':[{'-':r"^coe",'+':u(r"[aeiouéèàüëöêîôûù]")},'gz',1], ## mots qui commencent par un 'coex' suivi d'une voyelle
+			'gz_4':[{'-':r"^ine",'+':u(r"[aeiouéèàüëöêîôûù]")},'gz',1], ## mots qui commencent par un 'inex' suivi d'une voyelle
+			'gz_5':[{'-':u(r"^(p?)rée"),'+':u(r"[aeiouéèàüëöêîôûù]")},'gz',1], ## mots qui commencent par un 'réex' ou 'préex' suivi d'une voyelle
+			'_aeox':[{'-':r"[aeo]"},'ks',1],
+			'fix':[{'-':r"fi"},'ks',1],
+			'_ix':[{'-':u(r"(remi|obéli|astéri|héli|phéni|féli)")},'ks',1],
+			'*':[{},'ks',1],
+			'@':[{},'#',1]}],
+	'y' : [['m','n','nm','abbaye','y_voyelle'],
+			{'y_voyelle':[{'+':u(r"[aeiouéèàüëöêîôûù]")},'j',1], ## y suivi d'une voyelle donne [j]
+			'abbaye':[{'-':r"abba",'+':r"e"},'i', 1], ## abbaye... bien irrégulier
+			'n':[{'+':u(r"n[bcçdfghjklmpqrstvwxz]")},'e~',2],
+			'm':[{'+':r"m[mpb]"},'e~',2],
+			'nm':[{'+':r"[n|m]$"},'e~',2],
+			'*':[{},'i',1]}],
+	'z' : [['riz', 'iz', 'gaz'],
+			{'riz':[{'-':r"i",'+':r"$"},'#',1], ## y suivi d'une voyelle donne [j]
+			'iz':[{'-':r"i",'+':r"$"},'z',1],
+			'gaz':[{'-':r"a",'+':r"$"},'z',1],
+			'*':[{},'z',1],
+			'@':[{},'#',1]}],
+	'\'' : [[],
+			{'*':[{},'#',1],
+			'@':[{},'#',1]}],
+	'@' : [[],
+			{'*':[{},'#',1],
+			'@':[{},'#',1]}],
+	'_' : [[],
+			{'*':[{},'#',1],
+			'@':[{},'#',1]}]
+}
 
 ###################################################################################
 # Élimine des caractères de la chaîne de caractères à traiter
@@ -1196,66 +1209,51 @@ def teste_regle(nom_regle, cle, mot, pos_mot):
 
 	logging.debug ('mot : '+mot+'['+str(pos_mot-1)+'] lettre : '+mot[pos_mot-1]+' regle : '+nom_regle)
 	if hasattr(cle, '__call__'):
-		# la regle est une fonction spécifique
+		#la regle est une fonction spécifique
+		#logging.debug(nom_regle, ' fonction');
 		return cle(mot, pos_mot)
 
-	## exemples : +["n","m"] ou -["[aeiou]"]
-	cles = u(cle).split(';')
-	trouves = []
-	for unecle in cles:
-		logging.debug ('cle testee : '+unecle)
-		sens = unecle[0]
-		val = eval(unecle[1:])
-		trouve = False
+	#exemples : '+':'n|m' ou '-':'[aeiou]'
+	trouve_s = True
+	trouve_p = True
 
-		if sens == '+':
-			## il faut lire les lettres qui suivent
-			portion = mot[pos_mot:]
-			i = 0
-			while (not trouve) and (i < len(val)):
-				# recherche le modèle demandé au début de la suite du mot
-				trouve = (re.match(val[i], portion) != None)
-				i += 1
-		elif sens == '-':
-			## il faut lire les lettres qui précèdent
-			i = 0
-			while (not trouve) and (i < len(val)):
-				# teste si la condition inclut le début du mot ou seulement les lettres qui précèdent
-				if val[i].find('^') >= 0 and val[i].find('[^') < 0: # le ^ signifie 'début de chaîne' et non 'tous sauf'
-					if len(val[i]) == 1:
-						# on vérifie que le début de mot est vide
-						trouve = (pos_mot == 1)
-					else:
-						# le début du mot doit correspondre au pattern
-						m = re.match(val[i], mot[:pos_mot-1])
-						if (m != None):
-							trouve = (len(m.group()) == len(mot[:pos_mot-1]))
-						else:
-							trouve = False
-				else:
-					# recherche le modèle demandé à la fin du début du mot
-					pattern = re.compile(val[i])
+	if '+' in cle.keys():
+		logging.debug(nom_regle+ ' cle + testee : '+cle['+'])
+		logging.debug (mot, pos_mot)
+		#il faut lire les lettres qui suivent
+		#recherche le modèle demandé au début de la suite du mot
+		pattern = re.compile(cle['+'])
+		res = pattern.match(mot, pos_mot)
+		trouve_s = ((res != None) and (res.start() == pos_mot))
+	
+	if '-' in cle.keys():
+		logging.debug(nom_regle+ ' cle - testee : '+cle['-']);
+		trouve_p = False
+		pattern = re.compile(cle['-'])
+		#teste si la condition inclut le début du mot ou seulement les lettres qui précèdent
+		if (cle['-'][0] == '^'):
+			#le ^ signifie 'début de chaîne' et non 'tout sauf'
+			if (len(cle['-']) == 1):
+				#on vérifie que le début de mot est vide
+				trouve_p = (pos_mot == 1)
+			else:
+				#le début du mot doit correspondre au pattern
+				res = pattern.match(mot, 0, pos_mot)
+				if (res != None):
+					trouve_p = (res.end()-res.start()+1 == pos_mot)
+		else :
+			k = pos_mot-2
+			while ((k > -1) and (not trouve_p)):
+				logging.debug (mot, k, pos_mot)
+				#il faut lire les lettres qui précèdent
+				#recherche le modèle demandé à la fin du début du mot
+				res = pattern.match(mot, k, pos_mot)
+				if (res != None):
+					#print (res.end(), res.start())
+					trouve_p = (res.end()-res.start()+1 == pos_mot-k)
+				k -= 1
 
-					# appliquer le pattern sur toutes les portions possibles du début de mot
-					rem = [(mot[i:pos_mot-1],pattern.match(mot[i:pos_mot-1])) for i in range(pos_mot-1)]
-
-					# compare la portion reconnue et la portion testée
-					urem = [m for m in rem if m[1] != None]
-					lrem = [len(m[1].group())==len(m[0]) for m in urem]
-
-					# trouve = au moins 1 succès
-					if len(lrem) > 0:
-						trouve  = reduce(lambda x,y: x or y, lrem)
-					else:
-						trouve = False
-				i += 1
-		trouves.append(trouve)
-
-	final = reduce(lambda x, y: x & y, trouves)
-	if final:
-		logging.info ('mot:'+mot+'['+str(pos_mot-1)+'] ; lettre:'+mot[pos_mot-1]+' ; regle appliquee:'+nom_regle+' ; clef utilisee:'+cle)
-
-	return final
+	return (trouve_p and trouve_s)
 
 ###################################################################################
 # Décodage d'un mot sous la forme d'une suite de phonèmes
@@ -1396,7 +1394,7 @@ def post_traitement_o_ouvert_ferme(pp):
 
 	# indice du dernier phonème prononcé
 	nb_ph = len(phonemes)-1
-	while nb_ph >= 1 and phonemes[nb_ph] == "#":
+	while nb_ph > 0 and phonemes[nb_ph] == "#":
 		nb_ph -= 1
 
 	# recherche de tous les indices de phonèmes avec 'o'

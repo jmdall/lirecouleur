@@ -37,7 +37,7 @@ class TestSonsIsoles(unittest.TestCase):
 		[('a~', 'en')], [('a~', 'an')], [('a~', 'am')], [('x~', 'un')],
 		[('x~', 'um')], [('e~', 'in')], [('e~', 'im')], [('e', u('é'))], [('e_comp', 'er')],
 		[('e_comp', 'ez')], [('e_comp', 'et')], [('e^', u('è'))], [('e^_comp', 'est')],
-		[('e_comp', 'ai')], [('e^_comp', 'ei')]]
+		[('e_comp', 'ai')], [('e^_comp', 'ei')], [('wa', 'oi')], [('w5', 'oin')]]
 	
 		self.consonnes = [[('b', 'b')], [('s_c', 'c')], [('d', 'd')], [('f', 'f')],
 		[('g', 'g')], [('#', 'h')], [('i', 'i')], [('z^', 'j')], [('k', 'k')], [('l', 'l')],
@@ -105,7 +105,7 @@ class TestMotsRegleC(unittest.TestCase):
 		('ce', [('s_c', 'c'), ('q', 'e')]),
 		('ci', [('s_c', 'c'), ('i', 'i')]),
 		('cygne', [('s_c', 'c'), ('i', 'y'), ('n~', 'gn'), ('q_caduc', 'e')]),
-		('choeur', [('k', 'ch'), ('x^', 'oeu'), ('r', 'r')]),
+		('choeur', [('k', 'ch'), ('x', 'oeu'), ('r', 'r')]),
 		('chorale', [('k', 'ch'), ('o_ouvert', 'o'), ('r', 'r'), ('a', 'a'), ('l', 'l'), ('q_caduc', 'e')]),
 		('psychologue', [('p', 'p'), ('s', 's'), ('i', 'y'), ('k', 'ch'), ('o', 'o'), ('l', 'l'), ('o', 'o'), ('g_u', 'gu'), ('q_caduc', 'e')]),
 		('brachiosaure', [('b', 'b'), ('r', 'r'), ('a', 'a'), ('k', 'ch'), ('j', 'i'), ('o', 'o'), ('z_s', 's'), ('o_comp', 'au'), ('r', 'r'), ('q_caduc', 'e')]),
@@ -188,7 +188,7 @@ class TestMotsRegleE(unittest.TestCase):
 		('que', [('k_qu', 'qu'), ('q', 'e')]),
 		('geai', [('z^_g', 'g'), ('#', 'e'), ('e^_comp', 'ai')]),
 		('jean', [('z^', 'j'), ('#', 'e'), ('a~', 'an')]),
-		('asseoir', [('a', 'a'), ('s', 'ss'), ('#', 'e'), ('w', 'oi'), ('r', 'r')]),
+		('asseoir', [('a', 'a'), ('s', 'ss'), ('#', 'e'), ('wa', 'oi'), ('r', 'r')]),
 		('correcte', [('k', 'c'), ('o_ouvert', 'o'), ('r', 'rr'), ('e^_comp', 'e'), ('k', 'c'), ('t', 't'), ('q_caduc', 'e')]),
 		('aster', [('a', 'a'), ('s', 's'), ('t', 't'), ('e^_comp', 'e'), ('r', 'r')]),
 		('cher', [('s^', 'ch'), ('e^_comp', 'e'), ('r', 'r')]),
@@ -214,8 +214,8 @@ class TestMotsRegleG(unittest.TestCase):
 		('gomme', [('g', 'g'), ('o_ouvert', 'o'), ('m', 'mm'), ('q_caduc', 'e')]),
 		('gypse', [('z^_g', 'g'), ('i', 'y'), ('p', 'p'), ('s', 's'), ('q_caduc', 'e')]),
 		('geste', [('z^_g', 'g'), ('e^_comp', 'e'), ('s', 's'), ('t', 't'), ('q_caduc', 'e')]),
-		('poing', [('p', 'p'), ('u', 'o'), ('e~', 'in'), ('#', 'g')]),
-		('doigt', [('d', 'd'), ('w', 'oi'), ('#', 'g'), ('#', 't')]),
+		('poing', [('p', 'p'), ('w5', 'oin'), ('#', 'g')]),
+		('doigt', [('d', 'd'), ('wa', 'oi'), ('#', 'g'), ('#', 't')]),
 		('gourd', [('g', 'g'), ('u', 'ou'), ('r', 'r'), ('#', 'd')]),
 		('sang', [('s', 's'), ('a~', 'an'), ('#', 'g')]),
 		('long', [('l', 'l'), ('o~', 'on'), ('#', 'g')]),
@@ -351,14 +351,14 @@ class TestMotsRegleN(unittest.TestCase):
 class TestMotsRegleO(unittest.TestCase):
 	def setUp(self):
 		self.mots = [
-		('coin', [('k', 'c'), ('u', 'o'), ('e~', 'in')]),
-		('roi', [('r', 'r'), ('w', 'oi')]),
+		('coin', [('k', 'c'), ('w5', 'oin')]),
+		('roi', [('r', 'r'), ('wa', 'oi')]),
 		('clou', [('k', 'c'), ('l', 'l'), ('u', 'ou')]),
 		('clown', [('k', 'c'), ('l', 'l'), ('u', 'ow'), ('n', 'n')]),
 		('bon', [('b', 'b'), ('o~', 'on')]),
 		('zoo', [('z', 'z'), ('o', 'oo')]),
 		('coefficient', [('k', 'c'), ('o', 'o'), ('e^_comp', 'e'), ('f', 'ff'), ('i', 'i'), ('s_c', 'c'), ('j', 'i'), ('a~', 'en'), ('#', 't')]),
-		('moelle', [('m', 'm'), ('w', 'oe'), ('l', 'll'), ('q_caduc', 'e')]),
+		('moelle', [('m', 'm'), ('wa', 'oe'), ('l', 'll'), ('q_caduc', 'e')]),
 		('foetus', [('f', 'f'), ('e', 'oe'), ('t', 't'), ('y', 'u'), ('#', 's')]),
 		('oeil', [('x', 'oe'), ('j', 'il')]),
 		('homme', [('#', 'h'), ('o_ouvert', 'o'), ('m', 'mm'), ('q_caduc', 'e')])
@@ -551,7 +551,7 @@ class TestMotsRegleY(unittest.TestCase):
 	def setUp(self):
 		self.mots = [
 		('abbaye', [('a', 'a'), ('b', 'bb'), ('e^_comp', 'a'), ('i', 'y'), ('#', 'e')]),
-		('voyage', [('v', 'v'), ('w', 'o'), ('j', 'y'), ('a', 'a'), ('z^_g', 'g'), ('q_caduc', 'e')]),
+		('voyage', [('v', 'v'), ('wa', 'o'), ('j', 'y'), ('a', 'a'), ('z^_g', 'g'), ('q_caduc', 'e')]),
 		('pays', [('p', 'p'), ('e^_comp', 'a'), ('i', 'y'), ('#', 's')]),
 		('synchroniser', [('s', 's'), ('e~', 'yn'), ('k', 'ch'), ('r', 'r'), ('o', 'o'), ('n', 'n'), ('i', 'i'), ('z_s', 's'), ('e_comp', 'er')]),
 		('gymnaste', [('z^_g', 'g'), ('i', 'y'), ('m', 'm'), ('n', 'n'), ('a', 'a'), ('s', 's'), ('t', 't'), ('q_caduc', 'e')]),
@@ -654,14 +654,14 @@ class TestSyllabesMots2(unittest.TestCase):
 		('cassis', [('k', 'c'), ('a', 'a'), ('s', 'ss'), ('i', 'i'), ('#', 's')]),
 		('net', [('n', 'n'), ('e^_comp', 'et')]),
 		('faisan', [('f', 'f'), ('e^_comp', 'ai'), ('z_s', 's'), ('a~', 'an')]),
-		('moelle', [('m', 'm'), ('w', 'oe'), ('l', 'll'), ('q_caduc', 'e')]),
+		('moelle', [('m', 'm'), ('wa', 'oe'), ('l', 'll'), ('q_caduc', 'e')]),
 		('aiguille', [('e^_comp', 'ai'), ('g', 'g'), ('y', 'u'), ('i', 'i'), ('j', 'll'), ('q_caduc', 'e')]),
 		('porc', [('p', 'p'), ('o_ouvert', 'o'), ('r', 'r'), ('#', 'c')]),
 		('tabac', [('t', 't'), ('a', 'a'), ('b', 'b'), ('a', 'a'), ('#', 'c')]),
 		('ours', [('u', 'ou'), ('r', 'r'), ('s', 's')]),
 		('chorale', [('k', 'ch'), ('o_ouvert', 'o'), ('r', 'r'), ('a', 'a'), ('l', 'l'), ('q_caduc', 'e')]),
 		('femme', [('f', 'f'), ('a', 'e'), ('m', 'mm'), ('q_caduc', 'e')]),
-		('oignon', [('w', 'oi'), ('n~', 'gn'), ('o~', 'on')]),
+		('oignon', [('o', 'oi'), ('n~', 'gn'), ('o~', 'on')]),
 		('écho', [('e', 'é'), ('s^', 'ch'), ('o', 'o')]),
 		('automne', [('o_comp', 'au'), ('t', 't'), ('o', 'o'), ('#', 'm'), ('n', 'n'), ('q_caduc', 'e')]),
 		('mille', [('m', 'm'), ('i', 'i'), ('l', 'll'), ('q_caduc', 'e')]),
