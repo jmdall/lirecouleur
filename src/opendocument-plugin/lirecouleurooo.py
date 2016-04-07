@@ -2760,11 +2760,13 @@ class StyleSyllDys(unohelper.Base, XJobExecutor):
     def trigger(self, args):
         desktop = self.ctx.ServiceManager.createInstanceWithContext('com.sun.star.frame.Desktop', self.ctx)
         __lirecouleur_syllabes__(desktop.getCurrentComponent(), "dys")
+        __lirecouleur_dynsylldys__(desktop.getCurrentComponent())
 
 def lirecouleur_sylldys( args=None ):
     """Mise en évidence des syllabes -- dyslexiques"""
     xDocument = XSCRIPTCONTEXT.getDocument()
     __lirecouleur_syllabes__(xDocument, 'dys')
+    __lirecouleur_dynsylldys__(xDocument)
 
 def __lirecouleur_syllabes__(xDocument, style = 'souligne'):
     __arret_dynsylldys__(xDocument)
@@ -3292,19 +3294,6 @@ class LireCouleurHandler(unohelper.Base, XKeyHandler):
 ###################################################################################
 # Fonctions appelées pour le coloriage dynamique des syllabes
 ###################################################################################
-class StyleDynSyllDys(unohelper.Base, XJobExecutor):
-    """Mise en évidence des syllabes dynamiquement -- dyslexiques"""
-    def __init__(self, ctx):
-        self.ctx = ctx
-    def trigger(self, args):
-        desktop = self.ctx.ServiceManager.createInstanceWithContext('com.sun.star.frame.Desktop', self.ctx)
-        __lirecouleur_dynsylldys__(desktop.getCurrentComponent())
-
-def lirecouleur_dynsylldys( args=None ):
-    """Mise en évidence des syllabes dynamiquement -- dyslexiques"""
-    xDocument = XSCRIPTCONTEXT.getDocument()
-    __lirecouleur_dynsylldys__(xDocument)
-
 def __lirecouleur_dynsylldys__(xDocument):
     """Mise en évidence des syllabes soulignées dynamiquement"""
     try:
@@ -3321,19 +3310,6 @@ def __lirecouleur_dynsylldys__(xDocument):
         xDocument.getCurrentController().addKeyHandler(__memoKeys__[key]['handler'])
     except:
         pass
-
-class ArretDynSyllDys(unohelper.Base, XJobExecutor):
-    """Arrêt de la mise en évidence des syllabes dynamiquement -- dyslexiques"""
-    def __init__(self, ctx):
-        self.ctx = ctx
-    def trigger(self, args):
-        desktop = self.ctx.ServiceManager.createInstanceWithContext('com.sun.star.frame.Desktop', self.ctx)
-        __arret_dynsylldys__(desktop.getCurrentComponent())
-
-def arret_dynsylldys( args=None ):
-    """Arrêt de la mise en évidence des syllabes dynamiquement -- dyslexiques"""
-    xDocument = XSCRIPTCONTEXT.getDocument()
-    __arret_dynsylldys__(xDocument)
 
 def __arret_dynsylldys__(xDocument):
     """Arrêt de la mise en évidence des syllabes soulignées dynamiquement"""
@@ -3363,7 +3339,7 @@ lirecouleur_liaisons_forcees, lirecouleur_bdpq, lirecouleur_suppr_syllabes, lire
 lirecouleur_phrase, lirecouleur_suppr_points, lirecouleur_phon_muet, lirecouleur_phonemes_complexes, \
 new_lirecouleur_document, gererDictionnaireDialog, lirecouleur_espace_lignes, lirecouleur_consonne_voyelle, \
 lirecouleur_large, lirecouleur_extra_large, lirecouleur_noir, lirecouleur_separe_mots, \
-lirecouleur_couleur_mots, lirecouleur_dynsylldys, arret_dynsylldys,
+lirecouleur_couleur_mots,
 
 # --- faked component, dummy to allow registration with unopkg, no functionality expected
 g_ImplementationHelper = unohelper.ImplementationHelper()
@@ -3468,10 +3444,3 @@ g_ImplementationHelper.addImplementation( \
     StyleCouleurMots,'org.lirecouleur.StyleCouleurMots', \
     ('com.sun.star.task.Job',))
 
-g_ImplementationHelper.addImplementation( \
-    StyleDynSyllDys,'org.lirecouleur.StyleDynSyllDys', \
-    ('com.sun.star.task.Job',))
-
-g_ImplementationHelper.addImplementation( \
-    ArretDynSyllDys,'org.lirecouleur.ArretDynSyllDys', \
-    ('com.sun.star.task.Job',))

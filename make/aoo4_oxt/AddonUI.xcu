@@ -102,18 +102,6 @@
 										<value>_self</value>
 									</prop>
 								</node>
-								<node oor:name="N006_bis" oor:op="replace">
-									<prop oor:name="Title" oor:type="xs:string">
-										<value xml:lang="fr">Colorier les mots</value>
-										<value xml:lang="en">Colorize words</value>
-									</prop>
-									<prop oor:name="URL" oor:type="xs:string">
-										<value>service:org.lirecouleur.StyleCouleurMots</value>
-									</prop>
-									<prop oor:name="Target" oor:type="xs:string">
-										<value>_self</value>
-									</prop>
-								</node>
 								<node oor:name="N007" oor:op="replace">
 									<prop oor:name="URL" oor:type="xs:string">
 										<value>private:separator</value>
@@ -177,44 +165,12 @@
 										<value xml:lang="fr">Syllabes colorées</value>
 										<value xml:lang="en">Colored syllables</value>
 									</prop>
-                                    <node oor:name="Submenu">
-                                        <node oor:name="N013_1" oor:op="replace">
-                                            <prop oor:name="Title" oor:type="xs:string">
-                                                <value xml:lang="fr">Sélection</value>
-                                                <value xml:lang="en">Selection</value>
-                                            </prop>
-                                            <prop oor:name="URL" oor:type="xs:string">
-                                                <value>service:org.lirecouleur.StyleSyllDys</value>
-                                            </prop>
-                                            <prop oor:name="Target" oor:type="xs:string">
-                                                <value>_self</value>
-                                            </prop>
-                                        </node>
-                                        <node oor:name="N013_2" oor:op="replace">
-                                            <prop oor:name="Title" oor:type="xs:string">
-                                                <value xml:lang="fr">Mode dynamique</value>
-                                                <value xml:lang="en">Dynamically</value>
-                                            </prop>
-                                            <prop oor:name="URL" oor:type="xs:string">
-                                                <value>service:org.lirecouleur.StyleDynSyllDys</value>
-                                            </prop>
-                                            <prop oor:name="Target" oor:type="xs:string">
-                                                <value>_self</value>
-                                            </prop>
-                                        </node>
-                                        <node oor:name="N013_3" oor:op="replace">
-                                            <prop oor:name="Title" oor:type="xs:string">
-                                                <value xml:lang="fr">Arrêt mode dynamique</value>
-                                                <value xml:lang="en">Stop dynamic coloring</value>
-                                            </prop>
-                                            <prop oor:name="URL" oor:type="xs:string">
-                                                <value>service:org.lirecouleur.ArretDynSyllDys</value>
-                                            </prop>
-                                            <prop oor:name="Target" oor:type="xs:string">
-                                                <value>_self</value>
-                                            </prop>
-                                        </node>
-                                    </node>
+									<prop oor:name="URL" oor:type="xs:string">
+										<value>service:org.lirecouleur.StyleSyllDys</value>
+									</prop>
+									<prop oor:name="Target" oor:type="xs:string">
+										<value>_self</value>
+									</prop>
 								</node>
 								<node oor:name="N014" oor:op="replace">
 									<prop oor:name="Title" oor:type="xs:string">
@@ -882,32 +838,6 @@
 					</prop>
 					<prop oor:name="ImageBigURL" oor:type="xs:string">
 						<value>%origin%/images/black_26.png</value>
-					</prop>
-				</node>
-			</node>
-			<node oor:name="org.lirecouleur.img23" oor:op="replace">
-				<prop oor:name="URL" oor:type="xs:string">
-					<value>service:org.lirecouleur.StyleDynSyllDys</value>
-				</prop>
-				<node oor:name="UserDefinedImages">
-					<prop oor:name="ImageSmallURL" oor:type="xs:string">
-						<value>%origin%/images/dyn_syll_dys_16.png</value>
-					</prop>
-					<prop oor:name="ImageBigURL" oor:type="xs:string">
-						<value>%origin%/images/dyn_syll_dys_26.png</value>
-					</prop>
-				</node>
-			</node>
-			<node oor:name="org.lirecouleur.img24" oor:op="replace">
-				<prop oor:name="URL" oor:type="xs:string">
-					<value>service:org.lirecouleur.ArretDynSyllDys</value>
-				</prop>
-				<node oor:name="UserDefinedImages">
-					<prop oor:name="ImageSmallURL" oor:type="xs:string">
-						<value>%origin%/images/stop_dyn_syll_dys_16.png</value>
-					</prop>
-					<prop oor:name="ImageBigURL" oor:type="xs:string">
-						<value>%origin%/images/stop_dyn_syll_dys_26.png</value>
 					</prop>
 				</node>
 			</node>
