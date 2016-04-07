@@ -3174,6 +3174,12 @@ class Lire():
         self.choix_syllo = choix_syllo
         
     def debutMot(self, xtr):
+        if not self.curseurMot is None:
+            # remise en place de la couleur d'arrière plan de la syllabe
+            self.curseurMot.setPropertyToDefault('CharBackColor')
+            del self.curseurMot
+            del self.ps
+        
         self.curseurMot = xtr.getText().createTextCursorByRange(xtr)
         self.curseurMot.collapseToStart()
         xtr.gotoEndOfWord(True)
@@ -3207,16 +3213,18 @@ class Lire():
         xtr = xTextViewCursor.getText().createTextCursorByRange(xTextViewCursor)
 
         if xtr.isEndOfWord():
-            self.curseurMot.setPropertyToDefault('CharBackColor')
-            setStyle(styles_syllabes['dys'][str(self.jsyl%self.nb_altern+1)], self.curseurMot)
-            colorier_lettres_muettes(self.xDocument, self.ps[self.isyl], self.curseurMot, 'perso')
-            self.jsyl += 1
-            del self.curseurMot
-            del self.ps
+            if not self.curseurMot is None:
+                self.curseurMot.setPropertyToDefault('CharBackColor')
+                setStyle(styles_syllabes['dys'][str(self.jsyl%self.nb_altern+1)], self.curseurMot)
+                colorier_lettres_muettes(self.xDocument, self.ps[self.isyl], self.curseurMot, 'perso')
+                self.jsyl += 1
+                del self.curseurMot
+                del self.ps
+                self.curseurMot = None
 
             # passage au mot suivant
-            if xtr.gotoNextWord(False):
-                xTextViewCursor.gotoRange(xtr, False)
+            xtr.gotoNextWord(False)
+            xTextViewCursor.gotoRange(xtr, False)
             
         if xtr.isStartOfWord():
             self.debutMot(xtr)
@@ -3232,18 +3240,28 @@ class Lire():
 
                 self.isyl += 1
                 self.jsyl += 1
-                psyl = len(self.ps[self.isyl])
+                if self.isyl < len(self.ps):
+                    psyl = len(self.ps[self.isyl])
 
-                # surligner la syllabe courante
-                self.curseurMot.goRight(psyl, True)
-                self.curseurMot.setPropertyValue('CharBackColor', 0x00ffff00)
-                colorier_lettres_muettes(self.xDocument, self.ps[self.isyl], self.curseurMot, 'perso')
-                
-                # placer le curseur physique à la fin de la syllabe
-                self.xController.getViewCursor().goRight(psyl, False)
+                    # surligner la syllabe courante
+                    self.curseurMot.goRight(psyl, True)
+                    self.curseurMot.setPropertyValue('CharBackColor', 0x00ffff00)
+                    colorier_lettres_muettes(self.xDocument, self.ps[self.isyl], self.curseurMot, 'perso')
+                    
+                    # placer le curseur physique à la fin de la syllabe
+                    self.xController.getViewCursor().goRight(psyl, False)
+                else:
+                    xtr.gotoEndOfWord(False)
+                    xtr.gotoNextWord(False)
+                    del self.curseurMot
+                    self.curseurMot = None
+                    del self.ps
+                    xTextViewCursor.gotoRange(xtr, False)
             else:
-                # placement du curseur physique en cours de mot par l'utilisateur : on avance de 1 simplement
-                self.xController.getViewCursor().goRight(1, False)
+                # placement du curseur physique en cours de mot par l'utilisateur : passage au mot suivant
+                xtr.gotoNextWord(False)
+                xTextViewCursor.gotoRange(xtr, False)
+                #self.xController.getViewCursor().goRight(1, False)
 
         del xtr
 
@@ -3274,15 +3292,12 @@ class LireCouleurHandler(unohelper.Base, XKeyHandler):
     def keyPressed(self, event):
             if not(LireCouleurHandler.enabled and self.is_text_doc):
                 return False
-            try:
-                ##if event.Modifiers == MOD2:
-                if event.KeyCode == keyRight:
-                    # ALT + ->
-                    ##__deplacement__(self.xDocument, __lectureSuivant__)
-                    self.lit.selection()
-                    return True
-            except:
-                pass
+            ##if event.Modifiers == MOD2:
+            if event.KeyCode == keyRight:
+                # ALT + ->
+                ##__deplacement__(self.xDocument, __lectureSuivant__)
+                self.lit.selection()
+                return True
             return False
 
     def keyReleased(self, event):
