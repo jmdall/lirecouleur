@@ -2765,6 +2765,7 @@ class StyleSyllDys(unohelper.Base, XJobExecutor):
 def lirecouleur_sylldys( args=None ):
     """Mise en évidence des syllabes -- dyslexiques"""
     xDocument = XSCRIPTCONTEXT.getDocument()
+
     __lirecouleur_syllabes__(xDocument, 'dys')
     __lirecouleur_dynsylldys__(xDocument)
 
@@ -3163,7 +3164,7 @@ def __new_lirecouleur_document__(ctx):
 ###################################################################################
 class Lire():
     """Lit la syllabe courante sous le curseur"""
-    def __init__(self, xDocument, nb_altern, choix_syllo):
+    def __init__(self, xDocument, applic, nb_altern, choix_syllo):
         self.xDocument = xDocument
         self.xController = self.xDocument.getCurrentController()
         self.curseurMot = None
@@ -3172,6 +3173,7 @@ class Lire():
         self.jsyl = 0
         self.nb_altern = nb_altern
         self.choix_syllo = choix_syllo
+        self.applic = applic.startswith('openoffice')
         
     def debutMot(self, xtr):
         if not self.curseurMot is None:
@@ -3202,10 +3204,11 @@ class Lire():
         #ncurs = xtr.getText().createTextCursorByRange(xtr)
         self.curseurMot.goRight(psyl, True)
         self.curseurMot.setPropertyValue('CharBackColor', 0x00ffff00)
+        self.xController.getViewCursor().gotoRange(self.curseurMot, False)
+        if self.applic:
+            #in order to patch an openoffice bug
+            self.xController.getViewCursor().goLeft(1, False)
         colorier_lettres_muettes(self.xDocument, self.ps[self.isyl], self.curseurMot, 'perso')
-        
-        # placer le curseur physique à la fin de la syllabe
-        self.xController.getViewCursor().goRight(psyl, False)
 
     def selection(self):
         # récupération du curseur physique
@@ -3246,10 +3249,11 @@ class Lire():
                     # surligner la syllabe courante
                     self.curseurMot.goRight(psyl, True)
                     self.curseurMot.setPropertyValue('CharBackColor', 0x00ffff00)
+                    self.xController.getViewCursor().gotoRange(self.curseurMot, False)
+                    if self.applic:
+                        #in order to patch an openoffice bug
+                        self.xController.getViewCursor().goLeft(1, False)
                     colorier_lettres_muettes(self.xDocument, self.ps[self.isyl], self.curseurMot, 'perso')
-                    
-                    # placer le curseur physique à la fin de la syllabe
-                    self.xController.getViewCursor().goRight(psyl, False)
                 else:
                     xtr.gotoEndOfWord(False)
                     xtr.gotoNextWord(False)
@@ -3257,11 +3261,16 @@ class Lire():
                     self.curseurMot = None
                     del self.ps
                     xTextViewCursor.gotoRange(xtr, False)
+                    if self.applic:
+                        #in order to patch an openoffice bug
+                        self.xController.getViewCursor().goLeft(1, False)
             else:
                 # placement du curseur physique en cours de mot par l'utilisateur : passage au mot suivant
                 xtr.gotoNextWord(False)
                 xTextViewCursor.gotoRange(xtr, False)
-                #self.xController.getViewCursor().goRight(1, False)
+                if self.applic:
+                    #in order to patch an openoffice bug
+                    self.xController.getViewCursor().goLeft(1, False)
 
         del xtr
 
@@ -3271,7 +3280,7 @@ class Lire():
 class LireCouleurHandler(unohelper.Base, XKeyHandler):
     enabled = True
 
-    def __init__(self, xDocument):
+    def __init__(self, xDocument, applic):
         self.xDocument = xDocument
         self.is_text_doc = self.xDocument.supportsService("com.sun.star.text.TextDocument")
 
@@ -3287,7 +3296,7 @@ class LireCouleurHandler(unohelper.Base, XKeyHandler):
         # récupération de l'information sur le choix entre syllabes orales ou syllabes écrites
         choix_syllo = handleMaskSyllo()
 
-        self.lit = Lire(self.xDocument, nb_altern, choix_syllo)
+        self.lit = Lire(self.xDocument, applic, nb_altern, choix_syllo)
 
     def keyPressed(self, event):
             if not(LireCouleurHandler.enabled and self.is_text_doc):
@@ -3311,12 +3320,20 @@ class LireCouleurHandler(unohelper.Base, XKeyHandler):
 ###################################################################################
 def __lirecouleur_dynsylldys__(xDocument):
     """Mise en évidence des syllabes soulignées dynamiquement"""
+
+    oConfigProvider = createUnoService('com.sun.star.configuration.ConfigurationProvider')
+    ppp = createUnoStruct("com.sun.star.beans.PropertyValue")
+    ppp.Name = "nodepath"
+    ppp.Value = "/org.openoffice.Setup/Product"
+    xConfig = oConfigProvider.createInstanceWithArguments("com.sun.star.configuration.ConfigurationAccess", (ppp,))
+    applic = xConfig.getByName("ooName").lower()
+
     try:
         global __memoKeys__
         __arret_dynsylldys__(xDocument)
         
         key = xDocument.RuntimeUID
-        __memoKeys__[key] = {'doc':xDocument, 'handler':LireCouleurHandler(xDocument)}
+        __memoKeys__[key] = {'doc':xDocument, 'handler':LireCouleurHandler(xDocument, applic)}
 
         # enable/disable the key handlers
         __memoKeys__[key]['handler'].enable(True)
