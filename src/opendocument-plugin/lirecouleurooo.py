@@ -851,6 +851,8 @@ def creerSelectPhonemesDialog( args=None ):
     __creerSelectPhonemesDialog__(XSCRIPTCONTEXT.getDocument(), XSCRIPTCONTEXT.getComponentContext())
 
 def __creerSelectPhonemesDialog__(xDocument, xContext):
+    __arret_dynsylldys__(xDocument)
+
     """Ouvrir une fenêtre de dialogue pour sélectionner les phonèmes à visualiser."""
     import array
 
@@ -1374,6 +1376,8 @@ def gererDictionnaireDialog( args=None ):
     __gererDictionnaireDialog__(XSCRIPTCONTEXT.getDocument(), XSCRIPTCONTEXT.getComponentContext())
 
 def __gererDictionnaireDialog__(xDocument, xContext):
+    __arret_dynsylldys__(xDocument)
+
     """Ouvrir une fenêtre de dialogue pour gérer le dictionnaire des décodages spéciaux."""
     # i18n
     i18n()
@@ -2355,6 +2359,8 @@ def lirecouleur_defaut( args=None ):
     __lirecouleur_defaut__(XSCRIPTCONTEXT.getDocument())
 
 def __lirecouleur_defaut__(xDocument, choix='defaut'):
+    __arret_dynsylldys__(xDocument)
+
     """Applique le style par défaut à la sélection"""
     try:
         xTextRange = getXTextRange(xDocument, mode=0)
@@ -2400,6 +2406,8 @@ def lirecouleur_espace( args=None ):
     __lirecouleur_espace__(XSCRIPTCONTEXT.getDocument())
 
 def __lirecouleur_espace__(xDocument):
+    __arret_dynsylldys__(xDocument)
+
     """Espace les mots de la sélection"""
     try:
         xTextRange = getXTextRange(xDocument, mode=0)
@@ -2465,6 +2473,8 @@ def lirecouleur_separe_mots( args=None ):
     __lirecouleur_separe_mots__(XSCRIPTCONTEXT.getDocument())
 
 def __lirecouleur_separe_mots__(xDocument):
+    __arret_dynsylldys__(xDocument)
+
     """Sépare les mots de la sélection en coloriant les espaces"""
     xSelectionSupplier = xDocument.getCurrentController()
     xIndexAccess = xSelectionSupplier.getSelection()
@@ -2507,6 +2517,8 @@ def lirecouleur_couleur_mots( args=None ):
     __lirecouleur_couleur_mots__(XSCRIPTCONTEXT.getDocument())
 
 def __lirecouleur_couleur_mots__(xDocument):
+    __arret_dynsylldys__(xDocument)
+
     """Colorie les mots en alternant les couleurs (comme syll_dys)"""
     xSelectionSupplier = xDocument.getCurrentController()
     xIndexAccess = xSelectionSupplier.getSelection()
@@ -2557,6 +2569,8 @@ def lirecouleur_espace_lignes( args=None ):
     __lirecouleur_espace_lignes__(XSCRIPTCONTEXT.getDocument())
 
 def __lirecouleur_espace_lignes__(xDocument):
+    __arret_dynsylldys__(xDocument)
+
     try:
         xTextRange = getXTextRange(xDocument, mode=0)
         if xTextRange == None:
@@ -2587,6 +2601,8 @@ def lirecouleur_large( args=None ):
     __lirecouleur_large__(XSCRIPTCONTEXT.getDocument())
 
 def __lirecouleur_large__(xDocument):
+    __arret_dynsylldys__(xDocument)
+
     # espacement des mots
     __lirecouleur_espace__(xDocument)
 
@@ -2629,6 +2645,8 @@ def lirecouleur_extra_large( args=None ):
     __lirecouleur_extra_large__(XSCRIPTCONTEXT.getDocument())
 
 def __lirecouleur_extra_large__(xDocument):
+    __arret_dynsylldys__(xDocument)
+
     # espacement des mots
     __lirecouleur_large__(xDocument)
 
@@ -2664,6 +2682,8 @@ def lirecouleur_phonemes( args=None ):
     __lirecouleur_phonemes__(XSCRIPTCONTEXT.getDocument())
 
 def __lirecouleur_phonemes__(xDocument):
+    __arret_dynsylldys__(xDocument)
+
     """Colorie les phonèmes en couleurs arc en ciel"""
 
     __lirecouleur_defaut__(xDocument, 'noir')
@@ -2697,6 +2717,8 @@ def lirecouleur_phonemes_complexes( args=None ):
     __lirecouleur_phonemes_complexes__(XSCRIPTCONTEXT.getDocument())
 
 def __lirecouleur_phonemes_complexes__(xDocument):
+    __arret_dynsylldys__(xDocument)
+
     """Colorie les phonèmes complexes"""
 
     xTextRange = getXTextRange(xDocument, mode=3)
@@ -2745,6 +2767,8 @@ def lirecouleur_sylldys( args=None ):
     __lirecouleur_syllabes__(xDocument, 'dys')
 
 def __lirecouleur_syllabes__(xDocument, style = 'souligne'):
+    __arret_dynsylldys__(xDocument)
+
     """Mise en évidence des syllabes soulignées"""
     try:
         xTextRange = getXTextRange(xDocument, mode=1)
@@ -2781,6 +2805,8 @@ def lirecouleur_suppr_syllabes( args=None ):
     __lirecouleur_suppr_syllabes__(XSCRIPTCONTEXT.getDocument())
 
 def __lirecouleur_suppr_syllabes__(xDocument):
+    __arret_dynsylldys__(xDocument)
+
     try:
         xTextRange = getXTextRange(xDocument, mode=3)
         if xTextRange == None:
@@ -2809,6 +2835,8 @@ def lirecouleur_l_muettes( args=None ):
     __lirecouleur_l_muettes__(XSCRIPTCONTEXT.getDocument())
 
 def __lirecouleur_l_muettes__(xDocument):
+    __arret_dynsylldys__(xDocument)
+
     """Met uniquement en évidence les lettres muettes"""
     try:
         xTextRange = getXTextRange(xDocument, mode=1)
@@ -2840,6 +2868,8 @@ def lirecouleur_phon_muet( args=None ):
     __lirecouleur_phon_muet__(XSCRIPTCONTEXT.getDocument())
 
 def __lirecouleur_phon_muet__(xDocument):
+    __arret_dynsylldys__(xDocument)
+
     """Met uniquement en évidence les lettres muettes"""
     try:
         # Importer les styles de coloriage de texte
@@ -2885,6 +2915,8 @@ def lirecouleur_suppr_points( args=None ):
     __lirecouleur_suppr_points__(XSCRIPTCONTEXT.getDocument())
 
 def __lirecouleur_suppr_points__(xDocument):
+    __arret_dynsylldys__(xDocument)
+
     try:
         supprimer_point_l_muettes(xDocument)
     except:
@@ -2907,6 +2939,8 @@ def lirecouleur_phrase( args=None ):
     __lirecouleur_phrase__(XSCRIPTCONTEXT.getDocument())
 
 def __lirecouleur_phrase__(xDocument):
+    __arret_dynsylldys__(xDocument)
+
     """Marque les majuscules de début de phrase et les points de fin de phrase."""
     try:
         xTextRange = getXTextRange(xDocument, mode=2)
@@ -2948,6 +2982,8 @@ def lirecouleur_liaisons_forcees( args=None ):
     __lirecouleur_liaisons__(XSCRIPTCONTEXT.getDocument(), forcer=True)
 
 def __lirecouleur_liaisons__(xDocument, forcer=False):
+    __arret_dynsylldys__(xDocument)
+
     """Mise en évidence des liaisons"""
     xTextRange = getXTextRange(xDocument, mode=1)
     if xTextRange == None:
@@ -2977,6 +3013,8 @@ def lirecouleur_bdpq( args=None ):
     __lirecouleur_bdpq__(XSCRIPTCONTEXT.getDocument())
 
 def __lirecouleur_bdpq__(xDocument):
+    __arret_dynsylldys__(xDocument)
+
     """Colorie les lettres B, D, P, Q pour éviter les confusions"""
     try:
         xTextRange = getXTextRange(xDocument, mode=1)
@@ -3007,6 +3045,8 @@ def lirecouleur_consonne_voyelle( args=None ):
     __lirecouleur_consonne_voyelle__(XSCRIPTCONTEXT.getDocument())
 
 def __lirecouleur_consonne_voyelle__(xDocument):
+    __arret_dynsylldys__(xDocument)
+
     """Colorie les consonnes et les voyelles"""
     try:
         xTextRange = getXTextRange(xDocument, mode=1)
@@ -3033,6 +3073,8 @@ class StyleLignesAlternees(unohelper.Base, XJobExecutor):
         __lirecouleur_lignes__(desktop.getCurrentComponent())
 
 def __lirecouleur_lignes__(xDocument):
+    __arret_dynsylldys__(xDocument)
+
     #the writer controller impl supports the css.view.XSelectionSupplier interface
     xSelectionSupplier = xDocument.getCurrentController()
     xIndexAccess = xSelectionSupplier.getSelection()
@@ -3093,6 +3135,8 @@ def new_lirecouleur_document(args=None):
     __new_lirecouleur_document__(uno.getComponentContext())
 
 def __new_lirecouleur_document__(ctx):
+    __arret_dynsylldys__(xDocument)
+
     url = getLirecouleurTemplateURL()
     try:
         desktop = createUnoService('com.sun.star.frame.Desktop', ctx)
@@ -3117,28 +3161,21 @@ def __new_lirecouleur_document__(ctx):
 ###################################################################################
 class Lire():
     """Lit la syllabe courante sous le curseur"""
-    def __init__(self, xDocument):
+    def __init__(self, xDocument, nb_altern, choix_syllo):
         self.xDocument = xDocument
         self.xController = self.xDocument.getCurrentController()
         self.curseurMot = None
         self.ps = None
         self.isyl = 0
         self.jsyl = 0
-        self.nb_altern = 3
+        self.nb_altern = nb_altern
+        self.choix_syllo = choix_syllo
         
     def debutMot(self, xtr):
         self.curseurMot = xtr.getText().createTextCursorByRange(xtr)
+        self.curseurMot.collapseToStart()
         xtr.gotoEndOfWord(True)
         mot = xtr.getString()
-
-        # chargement du dictionnaire de décodage
-        loadLCDict(getLirecouleurDictionary())
-
-        # récupération de l'information sur le choix entre syllabes orales ou syllabes écrites
-        choix_syllo = handleMaskSyllo()
-        
-        # récupération de la période d'alternance des couleurs
-        self.nb_altern = handleMaskAlternate()
 
         # suppressions et remplacements de caractères perturbateurs
         mot = nettoyeur_caracteres(mot)
@@ -3147,27 +3184,39 @@ class Lire():
         pp = generer_paragraphe_phonemes(mot)
 
         # recompose les syllabes
-        self.ps = generer_paragraphe_syllabes(pp, choix_syllo)[0]
+        self.ps = generer_paragraphe_syllabes(pp, self.choix_syllo)[0]
         del pp
         
         # surligner la première syllabe
         self.isyl = 0
-        psyl = len(self.ps[self.isyl])-1
+        psyl = len(self.ps[self.isyl])
 
         #ncurs = xtr.getText().createTextCursorByRange(xtr)
-        self.curseurMot.goRight(psyl+1, True)
+        self.curseurMot.goRight(psyl, True)
         self.curseurMot.setPropertyValue('CharBackColor', 0x00ffff00)
         colorier_lettres_muettes(self.xDocument, self.ps[self.isyl], self.curseurMot, 'perso')
         
+        # placer le curseur physique à la fin de la syllabe
         self.xController.getViewCursor().goRight(psyl, False)
 
-    def selection(self, nb_altern):
+    def selection(self):
         # récupération du curseur physique
         xTextViewCursor = self.xController.getViewCursor()
         xtr = xTextViewCursor.getText().createTextCursorByRange(xTextViewCursor)
+
         if xtr.isEndOfWord():
-            self.deselection()
-        elif xtr.isStartOfWord():
+            self.curseurMot.setPropertyToDefault('CharBackColor')
+            setStyle(styles_syllabes['dys'][str(self.jsyl%self.nb_altern+1)], self.curseurMot)
+            colorier_lettres_muettes(self.xDocument, self.ps[self.isyl], self.curseurMot, 'perso')
+            self.jsyl += 1
+            del self.curseurMot
+            del self.ps
+
+            # passage au mot suivant
+            if xtr.gotoNextWord(False):
+                xTextViewCursor.gotoRange(xtr, False)
+            
+        if xtr.isStartOfWord():
             self.debutMot(xtr)
         else:
             if not self.curseurMot is None:
@@ -3181,42 +3230,20 @@ class Lire():
 
                 self.isyl += 1
                 self.jsyl += 1
-                psyl = len(self.ps[self.isyl])-1
+                psyl = len(self.ps[self.isyl])
 
-                self.curseurMot.goRight(psyl+1, True)
+                # surligner la syllabe courante
+                self.curseurMot.goRight(psyl, True)
                 self.curseurMot.setPropertyValue('CharBackColor', 0x00ffff00)
                 colorier_lettres_muettes(self.xDocument, self.ps[self.isyl], self.curseurMot, 'perso')
                 
-                xTextViewCursor.goRight(psyl, False)
+                # placer le curseur physique à la fin de la syllabe
+                self.xController.getViewCursor().goRight(psyl, False)
             else:
-                # prise en cours de mot
-                pass
+                # placement du curseur physique en cours de mot par l'utilisateur : on avance de 1 simplement
+                self.xController.getViewCursor().goRight(1, False)
 
         del xtr
-    
-    def deselection(self):
-        if not self.curseurMot is None:
-            try:
-                # remise en place de la couleur d'arrière plan de la syllabe
-                self.curseurMot.setPropertyToDefault('CharBackColor')
-                setStyle(styles_syllabes['dys'][str(self.jsyl%self.nb_altern+1)], self.curseurMot)
-                colorier_lettres_muettes(self.xDocument, self.ps[self.isyl], self.curseurMot, 'perso')
-                self.jsyl += 1
-            except:
-                pass
-            del self.curseurMot
-            self.curseurMot = None
-            
-            xTextViewCursor = self.xController.getViewCursor()
-            xtr = xTextViewCursor.getText().createTextCursorByRange(xTextViewCursor)
-            xtr.gotoNextWord(False)
-            xTextViewCursor.gotoRange(xtr, False)
-            xTextViewCursor.goLeft(1, False)
-            del xtr
-            
-        if not self.ps is None:
-            del self.ps
-            self.ps = None
 
 ###################################################################################
 # Classe de gestion des déplacements d'une syllabe à l'autre
@@ -3226,13 +3253,21 @@ class LireCouleurHandler(unohelper.Base, XKeyHandler):
 
     def __init__(self, xDocument):
         self.xDocument = xDocument
-        self.lit = Lire(self.xDocument)
         self.is_text_doc = self.xDocument.supportsService("com.sun.star.text.TextDocument")
+
         # Importer les styles de coloriage de texte
         importStylesLireCouleur(xDocument)
 
+        # chargement du dictionnaire de décodage
+        loadLCDict(getLirecouleurDictionary())
+
         # récup de la période d'alternance des couleurs
-        self.nb_altern = handleMaskAlternate()
+        nb_altern = handleMaskAlternate()
+
+        # récupération de l'information sur le choix entre syllabes orales ou syllabes écrites
+        choix_syllo = handleMaskSyllo()
+
+        self.lit = Lire(self.xDocument, nb_altern, choix_syllo)
 
     def keyPressed(self, event):
             if not(LireCouleurHandler.enabled and self.is_text_doc):
@@ -3242,19 +3277,14 @@ class LireCouleurHandler(unohelper.Base, XKeyHandler):
                 if event.KeyCode == keyRight:
                     # ALT + ->
                     ##__deplacement__(self.xDocument, __lectureSuivant__)
-                    self.lit.selection(self.nb_altern)
+                    self.lit.selection()
                     return True
-                else:
-                    self.lit.deselection()
             except:
                 pass
             return False
 
     def keyReleased(self, event):
         return False
-        
-    def disposing(self, event):
-        sel.lit.deselection()
         
     def enable(self, val=True):
         LireCouleurHandler.enabled = val
@@ -3314,6 +3344,13 @@ def __arret_dynsylldys__(xDocument):
         del __memoKeys__[key]['handler']
         __memoKeys__[key]['handler'] = None
         __memoKeys__[key]['doc'] = None
+        
+        xTextViewCursor = xDocument.getCurrentController().getViewCursor()
+        curseur = xTextViewCursor.getText().createTextCursorByRange(xTextViewCursor)
+        curseur.gotoStartOfWord(False)
+        curseur.gotoEndOfWord(True)
+        curseur.setPropertyToDefault('CharBackColor')
+        del curseur
     except:
         pass
 
