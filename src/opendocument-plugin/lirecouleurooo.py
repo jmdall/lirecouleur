@@ -29,6 +29,7 @@
 import uno
 import unohelper
 import traceback
+import sys
 import os
 import gettext
 from gettext import gettext as _
@@ -3173,7 +3174,7 @@ class Lire():
         self.jsyl = 0
         self.nb_altern = nb_altern
         self.choix_syllo = choix_syllo
-        self.applic = applic.startswith('openoffice')
+        self.applic = applic
         
     def debutMot(self, xtr):
         if not self.curseurMot is None:
@@ -3205,6 +3206,7 @@ class Lire():
         self.curseurMot.goRight(psyl, True)
         self.curseurMot.setPropertyValue('CharBackColor', 0x00ffff00)
         self.xController.getViewCursor().gotoRange(self.curseurMot, False)
+        self.xController.getViewCursor().collapseToEnd()
         if self.applic:
             #in order to patch an openoffice bug
             self.xController.getViewCursor().goLeft(1, False)
@@ -3249,7 +3251,8 @@ class Lire():
                     # surligner la syllabe courante
                     self.curseurMot.goRight(psyl, True)
                     self.curseurMot.setPropertyValue('CharBackColor', 0x00ffff00)
-                    self.xController.getViewCursor().gotoRange(self.curseurMot, False)
+                    xTextViewCursor.gotoRange(self.curseurMot, False)
+                    xTextViewCursor.collapseToEnd()
                     if self.applic:
                         #in order to patch an openoffice bug
                         self.xController.getViewCursor().goLeft(1, False)
@@ -3261,6 +3264,7 @@ class Lire():
                     self.curseurMot = None
                     del self.ps
                     xTextViewCursor.gotoRange(xtr, False)
+                    xTextViewCursor.collapseToEnd()
                     if self.applic:
                         #in order to patch an openoffice bug
                         self.xController.getViewCursor().goLeft(1, False)
@@ -3268,6 +3272,7 @@ class Lire():
                 # placement du curseur physique en cours de mot par l'utilisateur : passage au mot suivant
                 xtr.gotoNextWord(False)
                 xTextViewCursor.gotoRange(xtr, False)
+                xTextViewCursor.collapseToEnd()
                 if self.applic:
                     #in order to patch an openoffice bug
                     self.xController.getViewCursor().goLeft(1, False)
@@ -3326,7 +3331,8 @@ def __lirecouleur_dynsylldys__(xDocument):
     ppp.Name = "nodepath"
     ppp.Value = "/org.openoffice.Setup/Product"
     xConfig = oConfigProvider.createInstanceWithArguments("com.sun.star.configuration.ConfigurationAccess", (ppp,))
-    applic = xConfig.getByName("ooName").lower()
+    # le bug à corriger apparaît sur Apache OpenOffice sous Linux (pas Windows) - Mac non testé
+    applic = xConfig.getByName("ooName").lower().startswith('openoffice') and not sys.platform.startswith('win')
 
     try:
         global __memoKeys__
