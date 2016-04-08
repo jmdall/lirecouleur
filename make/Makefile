@@ -1,7 +1,7 @@
 all : LireCouleur.oxt LireCouleurAOO4.oxt tests web
 
 clean :
-	rm -r images locale pythonpath template lirecouleur.dic lirecouleurooo.py AddonUI.xcu description.xml LireCouleur.oxt LireCouleurAOO4.oxt ../tests/lirecouleur.*
+	rm -r images locale pythonpath template lirecouleur.dic lirecouleurooo.py AddonUI.xcu description.xml LireCouleur.oxt LireCouleurAOO4.oxt ../tests/lirecouleur.* ../src/firefox-plugin/data/lirecouleur.js
 
 core : Descriptions/descr-fr.txt Legal/license-fr.txt META-INF/manifest.xml WindowState/tbWriter.xcu ../src/opendocument-plugin/lirecouleurooo.py ../src/opendocument-plugin/pythonpath/lirecouleur.py
 	cp -r ../src/opendocument-plugin/* .
@@ -27,26 +27,5 @@ tests : ../src/opendocument-plugin/pythonpath/lirecouleur.py ../src/opendocument
 	cp ../src/opendocument-plugin/lirecouleur.dic ../tests/
 	python ../tests/tests_lirecouleur.py
 
-cleanweb:
-	rm ../src/web/js/jquery.min.js
-	rm ../src/web/js/jquery-ui.min.js
-	rm ../src/web/js/js.cookie.js
-	rm ../src/web/js/jquery.ui.touch-punch.min.js
-	rm ../src/web/js/evol.colorpicker.min.js
-	rm ../src/web/js/iosCheckbox.min.js
-	rm ../src/web/css/evol.colorpicker.min.css
-	rm ../src/web/css/iosCheckbox.css
-	rm ../src/web/css/jquery-ui.min.css
-	rm ../src/firefox-plugin/data/lirecouleur.js
-
 web :
-	cp ../src/vendors/js/jquery.min.js ../src/web/js/
-	cp ../src/vendors/js/jquery-ui.min.js ../src/web/js/
-	cp ../src/vendors/js/js.cookie.js ../src/web/js/
-	cp ../src/vendors/js/jquery.ui.touch-punch.min.js ../src/web/js/
-	cp ../src/vendors/js/evol.colorpicker.min.js ../src/web/js/
-	cp ../src/vendors/js/iosCheckbox.min.js ../src/web/js/
-	cp ../src/vendors/css/evol.colorpicker.min.css ../src/web/css/
-	cp ../src/vendors/css/iosCheckbox.css ../src/web/css/
-	cp ../src/vendors/css/jquery-ui.min.css ../src/web/css/
 	cp ../src/web/js/lirecouleur.js ../src/firefox-plugin/data/
