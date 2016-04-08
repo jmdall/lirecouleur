@@ -3,7 +3,7 @@
  * Ce module fait partie du projet LireCouleur - http://lirecouleur.arkaline.fr
  * 
  * @author Marie-Pierre Brungard
- * @version 0.1
+ * @version 1.2.0
  * @since 2016
  *
  * GNU General Public Licence (GPL) version 3
@@ -42,6 +42,12 @@ var lirecouleur_dsp = require("sdk/panel").Panel({
 });
 var lirecouleur_dsp_status = false;
 var lirecouleur_status = {};
+var selectedText = "";
+
+function selectionChanged(event){
+    selectedText = selection.text;
+}
+selection.on('select', selectionChanged);
 
 // bouton de lancement du traitement
 var lc_button1 = require("sdk/ui/button/action").ActionButton({
@@ -84,12 +90,12 @@ function handleButton1()
 		lc_button2.state("tab", {
 			disabled: false
 		});
-		if (selection.text) selection.text = "";
+		if (selectedText) selectedText = "";
 	} else {
-		if (selection.text) {
+		if (selectedText) {
 			// colorier et montrer le texte sélectionné dans une fenêtre
 			lirecouleur_dsp.on("show", function() {
-				lirecouleur_dsp.port.emit("show", selection.text, styles);
+				lirecouleur_dsp.port.emit("show", selectedText, styles);
 			});
 			getActiveView(lirecouleur_dsp).setAttribute("noautohide", true);
 			lirecouleur_dsp_status = !lirecouleur_dsp_status;
@@ -138,7 +144,7 @@ var lirecouleur_cfg = require("sdk/panel").Panel({
 	width: 700,
 	height: 400,
 	contentURL: data.url("lirecouleur_cfg.html"),
-	contentScriptFile: [data.url("jquery.min.js"),  data.url("jqColorPicker.min.js"), data.url("lirecouleur-cfg.js")]
+	contentScriptFile: [data.url("jquery-2.2.2.min.js"), data.url("jqColorPicker.min.js"), data.url("lirecouleur-cfg.js")]
 });
 
 // bouton pour ouvrir la fenêtre de configuration

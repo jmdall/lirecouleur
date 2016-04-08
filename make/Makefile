@@ -28,8 +28,6 @@ tests : ../src/opendocument-plugin/pythonpath/lirecouleur.py ../src/opendocument
 	python ../tests/tests_lirecouleur.py
 
 cleanweb:
-	rm ../src/firefox-plugin/data/jquery.min.js
-	rm ../src/firefox-plugin/data/jqColorPicker.min.js
 	rm ../src/web/js/jquery.min.js
 	rm ../src/web/js/jquery-ui.min.js
 	rm ../src/web/js/js.cookie.js
@@ -42,8 +40,6 @@ cleanweb:
 	rm ../src/firefox-plugin/data/lirecouleur.js
 
 web :
-	cp ../src/vendors/js/jquery.min.js ../src/firefox-plugin/data/
-	cp ../src/vendors/js/jqColorPicker.min.js ../src/firefox-plugin/data/
 	cp ../src/vendors/js/jquery.min.js ../src/web/js/
 	cp ../src/vendors/js/jquery-ui.min.js ../src/web/js/
 	cp ../src/vendors/js/js.cookie.js ../src/web/js/
