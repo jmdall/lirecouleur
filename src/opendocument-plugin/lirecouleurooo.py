@@ -1088,7 +1088,7 @@ def __creerSelectPhonemesDialog__(xDocument, xContext):
     sep2.TabIndex = 1
 
     checkPoint = createCheckBox(dialogModel, 10, sep2.PositionY+sep2.Height, "checkPoint", 0,
-                    _(u("Placer un point sous les lettres muettes")), selectpoint, dialogModel.Width-10)
+                    _(u("Placer des symboles sous certains sons")), selectpoint, dialogModel.Width-10)
 
     labelRadio = dialogModel.createInstance("com.sun.star.awt.UnoControlFixedTextModel")
     labelRadio.PositionX = 10
@@ -1584,6 +1584,66 @@ def marquePoint(xDocument, txt_phon, cursor):
 
     return cursor
 
+######################################################################################
+# Place un point sous une lettre muette
+######################################################################################
+def marqueImage(xDocument, stylphon, txt_phon, cursor):
+    from com.sun.star.text.TextContentAnchorType import AT_CHARACTER
+    from com.sun.star.text.WrapTextMode import THROUGHT
+    from com.sun.star.text.RelOrientation import CHAR
+    from com.sun.star.text.HoriOrientation import LEFT
+    from com.sun.star.text.VertOrientation import CHAR_BOTTOM
+
+    # définition de l'arc de cercle (cuvette)
+    fimgname = getLirecouleurURL()+"/imgsons/"+style_phon_perso[stylphon]['CharStyleName']+".png"
+    if os.path.isfile(uno.fileUrlToSystemPath(fimgname)):
+        hh = cursor.getPropertyValue("CharHeight")
+        
+        xViewCursorSupplier = xDocument.getCurrentController()
+        xTextViewCursor = xViewCursorSupplier.getViewCursor()
+        xTextViewCursor.gotoRange(cursor, False) # remet le curseur physique au début (du mot)
+        x0 = xTextViewCursor.Position.X
+
+        # déplace le curseur physique pour calculer la longueur de la cuvette à dessiner
+        xTextViewCursor.goRight(len(txt_phon), False)
+        x1 = xTextViewCursor.Position.X
+        if x1 < x0:
+            xTextViewCursor.goLeft(len(txt_phon), False)
+            xTextViewCursor.gotoEndOfLine(False)
+            x1 = xTextViewCursor.Position.X
+        ll = x1 - x0 # longueur de la place
+
+        sz = makeSize(hh*20, hh*20)
+        oShape = makeShape(xDocument, "com.sun.star.drawing.GraphicObjectShape")
+        oShape.GraphicURL = fimgname
+        oShape.Title= '_img_sous_'
+        oShape.Size = sz
+        oShape.FillTransparence = 100
+        oShape.LineTransparence = 100
+        ##print (oShape.Title, oShape.GraphicURL)
+
+        # ces lignes sont à placer AVANT le "insertTextContent" pour que la forme soit bien configurée
+        oShape.AnchorType = AT_CHARACTER # com.sun.star.text.TextContentAnchorType.AT_CHARACTER
+        oShape.HoriOrient = LEFT # com.sun.star.text.HoriOrientation.LEFT
+        oShape.LeftMargin = max(0, (ll-sz.Width)/2)
+        oShape.HoriOrientRelation = CHAR # com.sun.star.text.RelOrientation.CHAR
+        oShape.VertOrient = CHAR_BOTTOM # com.sun.star.text.VertOrientation.CHAR_BOTTOM
+        oShape.VertOrientRelation = CHAR # com.sun.star.text.RelOrientation.CHAR
+
+        # insertion de la forme dans le texte à la position du curseur
+        cursor.getText().insertTextContent(cursor, oShape, False)
+        cursor = deplacerADroite(txt_phon, cursor)
+
+        # cette ligne est à placer APRÈS le "insertTextContent" qui écrase la propriété
+        oShape.TextWrap = THROUGHT
+
+        #oShape.FillColor = 0x00888888
+        #oShape.LineStyle = 0
+    else:
+        cursor = deplacerADroite(txt_phon, cursor)
+
+    return cursor
+
 ###################################################################################
 # Applique un style de caractères donné
 ###################################################################################
@@ -1670,9 +1730,13 @@ def code_phonemes(xDocument, phonemes, style, cursor, selecteurphonemes=None, po
                     if stylphon in styles_phonemes[style]:
                         # appliquer le style demandé
                         cur = formaterTexte(txt_phon, cur, styles_phonemes[style], stylphon)
-                        if stylphon == '#' and point_lmuette and xDocument.supportsService("com.sun.star.text.TextDocument"):
-                            cur.goLeft(len(txt_phon), False)
-                            cur = marquePoint(xDocument, txt_phon, cur)
+                        if point_lmuette and xDocument.supportsService("com.sun.star.text.TextDocument"):
+                            if stylphon == '#':
+                                cur.goLeft(len(txt_phon), False)
+                                cur = marquePoint(xDocument, txt_phon, cur)
+                            else:
+                                cur.goLeft(len(txt_phon), False)
+                                cur = marqueImage(xDocument, stylphon, txt_phon, cur)                                
                     else:
                         # style non défini : appliquer le style par défaut
                         cur = formaterTexte(txt_phon, cur, styles_phonemes[style], '')
@@ -2314,16 +2378,16 @@ def supprimer_arcs_syllabes(xDocument, texte, cursor):
     del shapesup
 
 ###################################################################################
-# Suppression des points sous les lettres muettes pour la page en cours
+# Suppression des décorations sous les sons pour la page en cours
 ###################################################################################
-def supprimer_point_l_muettes(xDocument):
+def supprimer_deco_sons(xDocument):
     oDrawPage = xDocument.DrawPage
 
     shapesup=[]
     nNumShapes = oDrawPage.getCount()
     for x in range (nNumShapes): # toutes les formes de la page
         oShape = oDrawPage.getByIndex(x)
-        if oShape.Title == '__l_muette__':
+        if oShape.Title == '__l_muette__' or oShape.Title == '_img_sous_':
             shapesup.append(oShape)
 
     for oShape in shapesup:
@@ -2904,25 +2968,25 @@ def __lirecouleur_phon_muet__(xDocument):
     return True
 
 ###################################################################################
-# Supprime d'éventuels points sous les lettres muettes.
+# Supprime d'éventuelles décorations sous certains sons
 ###################################################################################
-class SupprimerPoints(unohelper.Base, XJobExecutor):
-    """Supprime les formes ajoutées sur la page pour marquer les lettres muettes"""
+class SupprimerDecos(unohelper.Base, XJobExecutor):
+    """Supprime les formes ajoutées sur la page pour marquer certains sons"""
     def __init__(self, ctx):
         self.ctx = ctx
     def trigger(self, args):
         desktop = self.ctx.ServiceManager.createInstanceWithContext('com.sun.star.frame.Desktop', self.ctx)
-        __lirecouleur_suppr_points__(desktop.getCurrentComponent())
+        __lirecouleur_suppr_decos__(desktop.getCurrentComponent())
 
-def lirecouleur_suppr_points( args=None ):
-    """Supprime les points ajoutés sous les lettres muettes"""
-    __lirecouleur_suppr_points__(XSCRIPTCONTEXT.getDocument())
+def lirecouleur_suppr_decos( args=None ):
+    """Supprime les formes ajoutées sur al page pour marquer certains sons"""
+    __lirecouleur_suppr_decos__(XSCRIPTCONTEXT.getDocument())
 
-def __lirecouleur_suppr_points__(xDocument):
+def __lirecouleur_suppr_decos__(xDocument):
     __arret_dynsylldys__(xDocument)
 
     try:
-        supprimer_point_l_muettes(xDocument)
+        supprimer_deco_sons(xDocument)
     except:
         return False
     return True
@@ -3374,7 +3438,7 @@ def __arret_dynsylldys__(xDocument):
 g_exportedScripts = lirecouleur_defaut, lirecouleur_espace, lirecouleur_phonemes, lirecouleur_syllabes, \
 lirecouleur_sylldys, lirecouleur_l_muettes, creerSelectPhonemesDialog, lirecouleur_liaisons, \
 lirecouleur_liaisons_forcees, lirecouleur_bdpq, lirecouleur_suppr_syllabes, lirecouleur_lignes, \
-lirecouleur_phrase, lirecouleur_suppr_points, lirecouleur_phon_muet, lirecouleur_phonemes_complexes, \
+lirecouleur_phrase, lirecouleur_suppr_decos, lirecouleur_phon_muet, lirecouleur_phonemes_complexes, \
 new_lirecouleur_document, gererDictionnaireDialog, lirecouleur_espace_lignes, lirecouleur_consonne_voyelle, \
 lirecouleur_large, lirecouleur_extra_large, lirecouleur_noir, lirecouleur_separe_mots, \
 lirecouleur_couleur_mots,
@@ -3435,7 +3499,7 @@ g_ImplementationHelper.addImplementation( \
     ('com.sun.star.task.Job',))
 
 g_ImplementationHelper.addImplementation( \
-    SupprimerPoints,'org.lirecouleur.SupprimerPoints', \
+    SupprimerDecos,'org.lirecouleur.SupprimerDecos', \
     ('com.sun.star.task.Job',))
 
 g_ImplementationHelper.addImplementation( \
