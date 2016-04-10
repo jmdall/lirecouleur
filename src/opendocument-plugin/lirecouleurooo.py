@@ -2449,10 +2449,12 @@ class StyleNoir(unohelper.Base, XJobExecutor):
         self.ctx = ctx
     def trigger(self, args):
         desktop = self.ctx.ServiceManager.createInstanceWithContext('com.sun.star.frame.Desktop', self.ctx)
+        __lirecouleur_suppr_decos__(desktop.getCurrentComponent())
         __lirecouleur_defaut__(desktop.getCurrentComponent(), 'noir')
 
 def lirecouleur_noir( args=None ):
     """Recode le texte sélectionné en noir"""
+    __lirecouleur_suppr_decos__(XSCRIPTCONTEXT.getDocument())
     __lirecouleur_defaut__(XSCRIPTCONTEXT.getDocument(), 'noir')
 
 ###################################################################################
