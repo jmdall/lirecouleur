@@ -1595,7 +1595,7 @@ def marqueImage(xDocument, stylphon, txt_phon, cursor):
     from com.sun.star.text.VertOrientation import CHAR_BOTTOM
 
     # définition de l'arc de cercle (cuvette)
-    fimgname = getLirecouleurURL()+"/imgsons/"+style_phon_perso[stylphon]['CharStyleName']+".png"
+    fimgname = getLirecouleurURL()+"/images/"+style_phon_perso[stylphon]['CharStyleName']+".png"
     if os.path.isfile(uno.fileUrlToSystemPath(fimgname)):
         hh = cursor.getPropertyValue("CharHeight")
         
