@@ -3204,7 +3204,7 @@ class Lire():
 
         #ncurs = xtr.getText().createTextCursorByRange(xtr)
         self.curseurMot.goRight(psyl, True)
-        self.curseurMot.setPropertyValue('CharBackColor', 0x00ffff00)
+        self.curseurMot.setPropertyValue('CharStyleName', 'altern_ligne_1')
         self.xController.getViewCursor().gotoRange(self.curseurMot, False)
         self.xController.getViewCursor().collapseToEnd()
         if self.applic:
@@ -3250,7 +3250,7 @@ class Lire():
 
                     # surligner la syllabe courante
                     self.curseurMot.goRight(psyl, True)
-                    self.curseurMot.setPropertyValue('CharBackColor', 0x00ffff00)
+                    self.curseurMot.setPropertyValue('CharStyleName', 'altern_ligne_1')
                     xTextViewCursor.gotoRange(self.curseurMot, False)
                     xTextViewCursor.collapseToEnd()
                     if self.applic:
