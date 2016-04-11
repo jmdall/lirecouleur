@@ -1412,7 +1412,7 @@ def post_traitement_yod(pp):
         
         # phonème suivant
         phon_suivant = ['a', 'a~', 'e', 'e^', 'e_comp', 'e^_comp', 'o', 'o~', 'e~', 'x', 'x^']
-        if phonemes[i_ph+1] in phon_suivant:
+        if phonemes[i_ph+1] in phon_suivant and len(pp[i_ph][1]) == 1:
             pp[i_ph] = ('j_'+phonemes[i_ph+1], pp[i_ph][1]+pp[i_ph+1][1])
             if len(pp[i_ph+2:]) > 0:
                 pp[i_ph+1:nb_ph] = pp[i_ph+2:nb_ph] # compactage de la chaîne de phonèmes

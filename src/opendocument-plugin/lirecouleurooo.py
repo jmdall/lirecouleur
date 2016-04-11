@@ -1738,7 +1738,7 @@ def code_phonemes(xDocument, phonemes, style, cursor, selecteurphonemes=None, de
                             if stylphon == '#':
                                 cur = marquePoint(xDocument, txt_phon, cur)
                             else:
-                                cur = marqueImage(xDocument, stylphon, txt_phon, cur)                                
+                                cur = marqueImage(xDocument, stylphon, txt_phon, cur)
                     elif stylphon.startswith('j_') or stylphon.startswith('w_') or stylphon.startswith('y_'):
                         # appliquer le style de la voyelle avec marquage de la semi-voyelle sur la première lettre
                         cur = formaterTexte(txt_phon, cur, styles_phonemes[style][stylphon[2:]])
@@ -1746,7 +1746,9 @@ def code_phonemes(xDocument, phonemes, style, cursor, selecteurphonemes=None, de
                         cur = formaterTexte(txt_phon[0], cur, {'CharStyleName':'yod_'+styles_phonemes[style][stylphon[2:]]['CharStyleName']})
                         if decos_phonomes and xDocument.supportsService("com.sun.star.text.TextDocument"):
                             cur.goLeft(1, False)
-                            cur = marqueImage(xDocument, stylphon[2:], txt_phon, cur)                                
+                            cur = marqueImage(xDocument, stylphon[2:], txt_phon, cur)
+                        else:
+                            cur.goRight(len(txt_phon)-1, False)
                     else:
                         # style non défini : appliquer le style par défaut
                         cur = formaterTexte(txt_phon, cur, 'defaut')

@@ -599,7 +599,7 @@ class TestSyllabesMots1(unittest.TestCase):
 		('fumer', [('f', 'f'), ('y', 'u'), ('m', 'm'), ('e_comp', 'er')]),
 		('appel', [('a', 'a'), ('p', 'pp'), ('e^_comp', 'e'), ('l', 'l')]),
 		('soleil', [('s', 's'), ('o', 'o'), ('l', 'l'), ('e^_comp', 'e'), ('j', 'il')]),
-		('meilleur', [('m', 'm'), ('e^_comp', 'e'), ('j_x', 'illeu'), ('r', 'r')]),
+		('meilleur', [('m', 'm'), ('e^_comp', 'e'), ('j', 'ill'), ('x', 'eu'), ('r', 'r')]),
 		('approche', [('a', 'a'), ('p', 'pp'), ('r', 'r'), ('o_ouvert', 'o'), ('s^', 'ch'), ('q_caduc', 'e')]),
 		('sonnerie', [('s', 's'), ('o', 'o'), ('n', 'nn'), ('q', 'e'), ('r', 'r'), ('i', 'i'), ('#', 'e')]),
 		('avenue', [('a', 'a'), ('v', 'v'), ('q', 'e'), ('n', 'n'), ('y', 'u'), ('#', 'e')]),
