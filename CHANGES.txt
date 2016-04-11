@@ -1,9 +1,11 @@
 Modifications :
+* prise en compte des sons composés comme 'ion', 'ien', 'ian' - référence : http://andre.thibault.pagesperso-orange.fr/PhonologieSemaine10.pdf
 
 Nouveautés :
-* Possibilité d'ajouter des symboles sous certains sons (expérimental)
+* possibilité d'ajouter des symboles sous certains sons (expérimental)
 
 Corrections :
+* correction du décodage des mots terminées par 'ef' comme nef, bief, chef, grief
 
 ------------------------- 3.5.0------------------------- 
 

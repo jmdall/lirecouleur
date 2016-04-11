@@ -884,7 +884,7 @@ autom = {
             'ment','imparfait','verbe_3_pluriel','au',
             'avoir','monsieur','jeudi','jeu_','eur','eu','eu_accent_circ','in','eil','y','iy','ennemi','enn_debut_mot','dessus_dessous',
             'et','cet','t_final','eclm_final','est','drz_final','n','adv_emment_a','femme','lemme','em_gene','nm','tclesmesdes',
-            'que_isole','que_gue_final','jtcnslemede','jean','ge','eoi','ex','reqquechose','2consonnes','abbaye','e_muet','e_caduc','e_deb'],
+            'que_isole','que_gue_final','jtcnslemede','jean','ge','eoi','ex','ef','reqquechose','2consonnes','abbaye','e_muet','e_caduc','e_deb'],
             {'_ent':[regle_mots_ent,'a~',2], ## quelques mots (adverbes ou noms) terminés par ent
             'adv_emment_fin':[{'-':r"emm",'+':r"nt"},'a~',2], ## adverbe avec 'emment' => se termine par le son [a~]
             'ment':[regle_ment,'a~',2], ## on considère que les mots terminés par 'ment' se prononcent [a~] sauf s'il s'agit d'un verbe
@@ -928,6 +928,7 @@ autom = {
             'ennemi':[{'-':r"^",'+':r"nnemi"},'e^_comp',1], ## ennemi est l'exception ou 'enn' en début de mot se prononce 'èn' (cf. enn_debut_mot)
             'enn_debut_mot':[{'-':r"^",'+':r"nn"},'a~',2], ## 'enn' en début de mot se prononce 'en'
             'ex':[{'+':r"x"},'e^',1], ## e suivi d'un x se prononce è
+            'ef':[{'+':r"f"},'e^',1], ## e suivi d'un f se prononce è
             'reqquechose':[{'-':r"r",'+':u(r"[bcçdfghjklmnpqrstvwxz](h|l|r)")},'q',1], ## re-quelque chose : le e se prononce 'e'
             'dessus_dessous':[{'-':r"d",'+':r"ss(o?)us"},'q',1], ## dessus, dessous : 'e' = e
             '2consonnes':[{'+':u(r"[bcçdfghjklmnpqrstvwxz]{2}")},'e^_comp',1], ## e suivi de 2 consonnes se prononce è
