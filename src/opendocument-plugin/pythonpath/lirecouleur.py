@@ -1572,6 +1572,8 @@ def extraire_syllabes_util(phonemes, mode=(ConstLireCouleur.SYLLABES_LC, ConstLi
         if isinstance(phon, tuple):
             if phon[0] in syllaphon['v']:
                 sylph.append(('v',[i]))
+            elif phon[0].startswith('j_') or phon[0].startswith('w_') or phon[0].startswith('y_'): # yod+voyelle, 'w'+voyelle, 'y'+voyelle sans diérèse
+                sylph.append(('v',[i]))
             elif phon[0] in syllaphon['c']:
                 sylph.append(('c',[i]))
             elif phon[0] in syllaphon['s']:
