@@ -5,7 +5,9 @@ Nouveautés :
 * possibilité d'ajouter des symboles sous certains sons (expérimental)
 
 Corrections :
-* correction du décodage des mots terminées par 'ef' comme nef, bief, chef, grief
+* correction du décodage des mots terminés par 'ef' comme nef, bief, chef, grief
+* correction du décodage des mots avec ï : païen, thaï, hawaïen
+* correction du décodage des mots avec w : w = [w] sauf pour wurt* (wurtemberg), wisig* (wisigoth), wag* (wagon)
 
 ------------------------- 3.5.0------------------------- 
 

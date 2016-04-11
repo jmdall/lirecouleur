@@ -880,7 +880,7 @@ autom = {
             'dmuet':[{'+':r"(s?)$"},'#',1], ## un d suivi éventuellement d'un s ex. : retards
             'apostrophe':[{'+':r"(\'|\’)"},'d',2], ## apostrophe
             '*':[{},'d',1]}],
-    'e' : [['conj_v_ier','uient','ien','een','except_en','_ent','clef','hier','adv_emment_fin',
+    'e' : [['conj_v_ier','uient','ien','een','except_en_1','except_en_2','_ent','clef','hier','adv_emment_fin',
             'ment','imparfait','verbe_3_pluriel','au',
             'avoir','monsieur','jeudi','jeu_','eur','eu','eu_accent_circ','in','eil','y','iy','ennemi','enn_debut_mot','dessus_dessous',
             'et','cet','t_final','eclm_final','est','drz_final','n','adv_emment_a','femme','lemme','em_gene','nm','tclesmesdes',
@@ -900,7 +900,8 @@ autom = {
             'em_gene':[{'+':u(r"m[bcçdfghjklmnpqrstvwxz]")},'a~',2], ## 'em' cas général => son [a~]
             'uient':[{'-':r"ui",'+':r"nt$"},'#',3], ## enfuient, appuient, fuient, ennuient, essuient
             'conj_v_ier':[regle_ient,'#',3], ## verbe du 1er groupe terminé par 'ier' conjugué à la 3ème pers du pluriel
-            'except_en':[{'-':u(r"exam|mino|édu"),'+':r"n(s?)$"},'e~',2], ## exceptions des mots où le 'en' final se prononce [e~] (héritage latin)
+            'except_en_1':[{'-':u(r"exam|mino|édu"),'+':r"n(s?)$"},'e~',2], ## exceptions des mots où le 'en' final se prononce [e~] (héritage latin)
+            'except_en_2':[{'-':u(r"[ao]ï"),'+':r"n(s?)$"},'e~',2], ## païen, hawaïen, tolstoïen
             'een':[{'-':u(r"é"),'+':r"n(s?)$"},'e~',2], ## les mots qui se terminent par 'éen'
             'ien':[{'-':r"[bdlmrstvh]i",'+':u(r"n([bcçdfghjklpqrstvwxz]|$)")},'e~',2], ## certains mots avec 'ien' => son [e~]
             'nm':[{'+':r"[nm]$"},'a~',2],
@@ -928,7 +929,7 @@ autom = {
             'ennemi':[{'-':r"^",'+':r"nnemi"},'e^_comp',1], ## ennemi est l'exception ou 'enn' en début de mot se prononce 'èn' (cf. enn_debut_mot)
             'enn_debut_mot':[{'-':r"^",'+':r"nn"},'a~',2], ## 'enn' en début de mot se prononce 'en'
             'ex':[{'+':r"x"},'e^',1], ## e suivi d'un x se prononce è
-            'ef':[{'+':r"f"},'e^',1], ## e suivi d'un f se prononce è
+            'ef':[{'+':r"[bf](s?)$"},'e^',1], ## e suivi d'un f ou d'un b en fin de mot se prononce è
             'reqquechose':[{'-':r"r",'+':u(r"[bcçdfghjklmnpqrstvwxz](h|l|r)")},'q',1], ## re-quelque chose : le e se prononce 'e'
             'dessus_dessous':[{'-':r"d",'+':r"ss(o?)us"},'q',1], ## dessus, dessous : 'e' = e
             '2consonnes':[{'+':u(r"[bcçdfghjklmnpqrstvwxz]{2}")},'e^_comp',1], ## e suivi de 2 consonnes se prononce è
@@ -991,8 +992,10 @@ autom = {
             'ie':[{'+':r"e(s)?$"},'i',1], ## mots terminés par -ie(s|nt)
             'i_voyelle':[{'+':u(r"[aäâeéèêëoôöuù]")},'j',1], ## i suivi d'une voyelle donne [j]
             '*':[{},'i',1]}],
-    u('ï') : [[],
-            {'*':[{},'i',1]}],
+    u('ï') : [['thai', 'aie'],
+            {'thai':[{'-':r"t(h?)a"},'j',1], ## taï, thaï et dérivés
+            'aie':[{'-':r"[ao]",'+':r"e"},'j',1], ## païen et autres
+            '*':[{},'i',1]}],
     u('î') : [[],
             {'*':[{},'i',1]}],
     'j' : [[],
@@ -1132,11 +1135,11 @@ autom = {
             {'*':[{},'y',1]}],
     'v' : [[],
             {'*':[{},'v',1]}],
-    'w' : [['wapiti','kiwi','sandwich'],
-            {'wapiti':[{'+':r"apiti"},'w',1],
-            'kiwi':[{'-':r"ki",'+':r"i"},'w',1],
-            'sandwich':[{'+':r"ich"},'w',1],
-            '*':[{},'v',1]}],
+    'w' : [['wurt','wisig','wag'],
+            {'wurt':[{'+':r"urt"},'v',1], # saucisse
+            'wisig':[{'+':r"isig"},'v',1], # wisigoth
+            'wag':[{'+':r"ag"},'v',1], # wagons et wagnérien
+            '*':[{},'w',1]}],
     'x' : [['six_dix','gz_1','gz_2','gz_3','gz_4','gz_5','_aeox','fix','_ix'],
             {'six_dix':[{'-':r"(s|d)i"},'s_x',1],
             'gz_1':[{'-':r"^",'+':u(r"[aeiouéèàüëöêîôûù]")},'gz',1], ## mots qui commencent par un x suivi d'une voyelle
