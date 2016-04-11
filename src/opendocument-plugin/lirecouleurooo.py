@@ -1595,7 +1595,10 @@ def marqueImage(xDocument, stylphon, txt_phon, cursor):
     from com.sun.star.text.VertOrientation import CHAR_BOTTOM
 
     # définition de l'arc de cercle (cuvette)
-    fimgname = getLirecouleurURL()+"/images/"+style_phon_perso[stylphon]['CharStyleName']+".png"
+    try:
+        fimgname = getLirecouleurURL()+"/images/"+style_phon_perso[stylphon]['CharStyleName']+".png"
+    except:
+        return deplacerADroite(txt_phon, cursor)
     if os.path.isfile(uno.fileUrlToSystemPath(fimgname)):
         hh = cursor.getPropertyValue("CharHeight")
         
@@ -1670,7 +1673,7 @@ def deplacerADroite(texte, ooocursor):
 # Insertion d'une chaîne de caractères selon un style donné. Retourne la position
 # suivante à laquelle insérer sous la forme d'un curseur
 ###################################################################################
-def formaterTexte(texte, ooocursor, style, choix_styl):
+def formaterTexte(texte, ooocursor, choix_styl):
     lgr_texte = len(texte)
 
     # coloriage du phonème courant
@@ -1688,7 +1691,7 @@ def formaterTexte(texte, ooocursor, style, choix_styl):
             ncurs.setPropertyToDefault("CharStyleName")
             ncurs.setPropertyToDefault("CharBackColor")
         else:
-            setStyle(style[choix_styl], ncurs)
+            setStyle(choix_styl, ncurs)
         del ncurs
     except:
         pass
@@ -1699,7 +1702,7 @@ def formaterTexte(texte, ooocursor, style, choix_styl):
 ###################################################################################
 # Transcode les phonèmes en couleurs selon le style choisi
 ###################################################################################
-def code_phonemes(xDocument, phonemes, style, cursor, selecteurphonemes=None, point_lmuette=False):
+def code_phonemes(xDocument, phonemes, style, cursor, selecteurphonemes=None, decos_phonomes=False):
     stylphon = ''
     nb_phon = len(phonemes)
     i_phon = range(nb_phon)
@@ -1729,17 +1732,24 @@ def code_phonemes(xDocument, phonemes, style, cursor, selecteurphonemes=None, po
                 else:
                     if stylphon in styles_phonemes[style]:
                         # appliquer le style demandé
-                        cur = formaterTexte(txt_phon, cur, styles_phonemes[style], stylphon)
-                        if point_lmuette and xDocument.supportsService("com.sun.star.text.TextDocument"):
+                        cur = formaterTexte(txt_phon, cur, styles_phonemes[style][stylphon])
+                        if decos_phonomes and xDocument.supportsService("com.sun.star.text.TextDocument"):
+                            cur.goLeft(len(txt_phon), False)
                             if stylphon == '#':
-                                cur.goLeft(len(txt_phon), False)
                                 cur = marquePoint(xDocument, txt_phon, cur)
                             else:
-                                cur.goLeft(len(txt_phon), False)
                                 cur = marqueImage(xDocument, stylphon, txt_phon, cur)                                
+                    elif stylphon.startswith('j_') or stylphon.startswith('w_') or stylphon.startswith('y_'):
+                        # appliquer le style de la voyelle avec marquage de la semi-voyelle sur la première lettre
+                        cur = formaterTexte(txt_phon, cur, styles_phonemes[style][stylphon[2:]])
+                        cur.goLeft(len(txt_phon), False)
+                        cur = formaterTexte(txt_phon[0], cur, {'CharStyleName':'yod_'+styles_phonemes[style][stylphon[2:]]['CharStyleName']})
+                        if decos_phonomes and xDocument.supportsService("com.sun.star.text.TextDocument"):
+                            cur.goLeft(1, False)
+                            cur = marqueImage(xDocument, stylphon[2:], txt_phon, cur)                                
                     else:
                         # style non défini : appliquer le style par défaut
-                        cur = formaterTexte(txt_phon, cur, styles_phonemes[style], '')
+                        cur = formaterTexte(txt_phon, cur, 'defaut')
 
     return cur
 
@@ -1829,7 +1839,7 @@ def code_syllabes(xDocument, syllabes, isyl, style, cursor, nb_altern=3):
         Traitement par coloriage des syllabes (affectation d'un style de caractère)
     """
     for j in range(sz_syllabes):
-        cursor = formaterTexte(syllabes[j], cursor, styles_syllabes[style], str(nisyl+1))
+        cursor = formaterTexte(syllabes[j], cursor, styles_syllabes[style][str(nisyl+1)])
         nisyl += 1
         nisyl = nisyl%nb_altern
 
@@ -2052,7 +2062,7 @@ def colorier_defaut(paragraphe, cursor, style, choix):
     paragraphe = nettoyeur_caracteres(paragraphe)
 
     # code le coloriage du paragraphe
-    curs = formaterTexte(paragraphe, cursor, styles_phonemes[style], choix)
+    curs = formaterTexte(paragraphe, cursor, choix)
 
     # supprimer les espaces dupliqués
     if (choix == 'defaut'):
@@ -2111,7 +2121,7 @@ def colorier_phrase(texte, cursor, style):
                 i += 1
             if paragraphe[j:i].istitle():
                 # Mot qui commence par une majuscule
-                curs = formaterTexte(paragraphe[j], curs, styles_phonemes[style], 'Majuscule')
+                curs = formaterTexte(paragraphe[j], curs, styles_phonemes[style]['Majuscule'])
                 j += 1
                 i = j
 
@@ -2124,7 +2134,7 @@ def colorier_phrase(texte, cursor, style):
             j = i
             while (i < len(paragraphe)) and (paragraphe[i] in ponct_fin_phrase):
                 i += 1
-            curs = formaterTexte(paragraphe[j:i], curs, styles_phonemes[style], 'Ponctuation')
+            curs = formaterTexte(paragraphe[j:i], curs, styles_phonemes[style]['Ponctuation'])
 
 ###################################################################################
 # Conversion d'un paragraphe en mettant ses phonèmes en couleur
@@ -2226,7 +2236,7 @@ def colorier_liaisons(texte, cursor, style, forcer=False):
                 # formatage de la liaison
                 curs = pp[i_mot]
                 curs.collapseToStart()
-                curs = formaterTexte(umot, curs, styles_phonemes[style], 'liaison')
+                curs = formaterTexte(umot, curs, styles_phonemes[style]['liaison'])
                 format_liaison = True
                 
                 # formater la dernière lettre du mot précédent comme lettre non muette
@@ -2310,7 +2320,7 @@ def colorier_bdpq(paragraphe, cursor, style):
         if paragraphe[i] in ensemble_confus:
             while (i < len(paragraphe)) and (paragraphe[i] == paragraphe[j]):
                 i += 1
-            curs = formaterTexte(paragraphe[j:i], curs, styles_phonemes[style], 'lettre_'+paragraphe[j])
+            curs = formaterTexte(paragraphe[j:i], curs, styles_phonemes[style]['lettre_'+paragraphe[j]])
         else:
             while (i < len(paragraphe)) and not(paragraphe[i] in ensemble_confus):
                 i += 1
@@ -2343,11 +2353,11 @@ def colorier_consonnes_voyelles(paragraphe, cursor, style):
         if paragraphe[i] in e_consonnes:
             while (i < len(paragraphe)) and (paragraphe[i] in e_consonnes):
                 i += 1
-            curs = formaterTexte(paragraphe[j:i], curs, styles_phonemes[style], 'consonne')
+            curs = formaterTexte(paragraphe[j:i], curs, styles_phonemes[style]['consonne'])
         elif paragraphe[i] in e_voyelles:
             while (i < len(paragraphe)) and (paragraphe[i] in e_voyelles):
                 i += 1
-            curs = formaterTexte(paragraphe[j:i], curs, styles_phonemes[style], 'voyelle')
+            curs = formaterTexte(paragraphe[j:i], curs, styles_phonemes[style]['voyelle'])
         else:
             while (i < len(paragraphe)) and not(paragraphe[i] in e_consonnes) and not(paragraphe[i] in e_voyelles):
                 i += 1
@@ -2959,7 +2969,7 @@ def __lirecouleur_phon_muet__(xDocument):
         xtr = xTextRange.getText().createTextCursorByRange(xTextRange)
         theString = xtr.getString()
         xtr.collapseToStart()
-        xtr = formaterTexte(theString, xtr, styles_phonemes['perso'], '#')
+        xtr = formaterTexte(theString, xtr, styles_phonemes['perso']['#'])
         if point_lmuette and xDocument.supportsService("com.sun.star.text.TextDocument"):
             xtr.goLeft(len(theString), False)
             xtr = marquePoint(xDocument, theString, xtr)

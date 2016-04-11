@@ -114,6 +114,13 @@ def handleMaskPhonems():
             selectphonemes[phon] = adata['__phon_selector__'][phon]
         except:
             pass
+    
+    # considérer que la sélection des phonèmes 'voyelle' s'étend à 'yod'+'voyelle'
+    for phon in ['a', 'a~', 'e', 'e^', 'e_comp', 'e^_comp', 'o', 'o~', 'e~', 'x', 'x^']:
+        try:
+            selectphonemes['j_'+phon] = selectphonemes[phon]
+        except:
+            pass
 
     del liste_phonemes
     del adata
@@ -1399,7 +1406,7 @@ def post_traitement_yod(pp):
             return pp
         
         # phonème suivant
-        phon_suivant = ['a', 'a~', 'e', 'o', 'o~', 'e~', 'x', 'x^']
+        phon_suivant = ['a', 'a~', 'e', 'e^', 'e_comp', 'e^_comp', 'o', 'o~', 'e~', 'x', 'x^']
         if phonemes[i_ph+1] in phon_suivant:
             pp[i_ph] = ('j_'+phonemes[i_ph+1], pp[i_ph][1]+pp[i_ph+1][1])
             if len(pp[i_ph+2:]) > 0:
