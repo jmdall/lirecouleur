@@ -357,9 +357,9 @@ __style_syll_souligne__ = {
         }
 
 __style_phon_perso__ = {
-        'verb_3p':{'CharColor':0x00aaaaaa, 'CharContoured':False},
-        '#':{'CharColor':0x00aaaaaa, 'CharContoured':False},
-        '#_amb':{'CharColor':0x0000000, 'CharContoured':True},
+        'verb_3p':{'CharColor':0x00aaaaaa},
+        '#':{'CharColor':0x00aaaaaa},
+        '#_amb':{'CharColor':0x0000000},
         'q_caduc':{'CharColor':0X00aaaaaa},
         'a':{'CharColor':0x000068de},
         'a~':{'CharColor':0x000068de, 'CharShadowed':True},
