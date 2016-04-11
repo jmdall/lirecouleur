@@ -8,6 +8,7 @@ Corrections :
 * correction du décodage des mots terminés par 'ef' comme nef, bief, chef, grief
 * correction du décodage des mots avec ï : païen, thaï, hawaïen
 * correction du décodage des mots avec w : w = [w] sauf pour wurt* (wurtemberg), wisig* (wisigoth), wag* (wagon)
+* un "i" en position 3 dans une syllabe devrait apparaître comme [ij] mais ici on va se contenter d'un [i] simple - exemple : sanglier
 
 ------------------------- 3.5.0------------------------- 
 
