@@ -10,7 +10,7 @@
 # 
 # voir http://www.arkaline.fr/doku.php?id=logiciels:lirecouleur
 #
-# Copyright (c) 2014 by Marie-Pierre Brungard
+# Copyright (c) 2016 by Marie-Pierre Brungard
 #
 # GNU General Public Licence (GPL) version 3
 #
@@ -42,7 +42,7 @@ class TestSonsIsoles(unittest.TestCase):
 		self.consonnes = [[('b', 'b')], [('s_c', 'c')], [('d', 'd')], [('f', 'f')],
 		[('g', 'g')], [('#', 'h')], [('i', 'i')], [('z^', 'j')], [('k', 'k')], [('l', 'l')],
 		[('m', 'm')], [('n', 'n')], [('p', 'p')], [('k', 'q')], [('r', 'r')], [('s', 's')],
-		[('t', 't')], [('v', 'v')], [('v', 'w')], [('#', 'x')], [('#', 'z')]]
+		[('t', 't')], [('v', 'v')], [('w', 'w')], [('#', 'x')], [('#', 'z')]]
 
 	def test_sons_voyelles(self):
 		nb_sons = len(self.voyelles)
@@ -108,9 +108,9 @@ class TestMotsRegleC(unittest.TestCase):
 		('choeur', [('k', 'ch'), ('x', 'oeu'), ('r', 'r')]),
 		('chorale', [('k', 'ch'), ('o_ouvert', 'o'), ('r', 'r'), ('a', 'a'), ('l', 'l'), ('q_caduc', 'e')]),
 		('psychologue', [('p', 'p'), ('s', 's'), ('i', 'y'), ('k', 'ch'), ('o', 'o'), ('l', 'l'), ('o', 'o'), ('g_u', 'gu'), ('q_caduc', 'e')]),
-		('brachiosaure', [('b', 'b'), ('r', 'r'), ('a', 'a'), ('k', 'ch'), ('j', 'i'), ('o', 'o'), ('z_s', 's'), ('o_comp', 'au'), ('r', 'r'), ('q_caduc', 'e')]),
+		('brachiosaure', [('b', 'b'), ('r', 'r'), ('a', 'a'), ('k', 'ch'), ('j_o', 'io'), ('z_s', 's'), ('o_comp', 'au'), ('r', 'r'), ('q_caduc', 'e')]),
 		('chiroptère', [('k', 'ch'), ('i', 'i'), ('r', 'r'), ('o_ouvert', 'o'), ('p', 'p'), ('t', 't'), ('e^', 'è'), ('r', 'r'), ('q_caduc', 'e')]),
-		('chrétien', [('k', 'ch'), ('r', 'r'), ('e', 'é'), ('t', 't'), ('j', 'i'), ('e~', 'en')]),
+		('chrétien', [('k', 'ch'), ('r', 'r'), ('e', 'é'), ('t', 't'), ('j_e~', 'ien')]),
 		('synchroniser', [('s', 's'), ('e~', 'yn'), ('k', 'ch'), ('r', 'r'), ('o', 'o'), ('n', 'n'), ('i', 'i'), ('z_s', 's'), ('e_comp', 'er')]),
 		('chat', [('s^', 'ch'), ('a', 'a'), ('#', 't')]),
 		('tabac', [('t', 't'), ('a', 'a'), ('b', 'b'), ('a', 'a'), ('#', 'c')]),
@@ -155,22 +155,22 @@ class TestMotsRegleE(unittest.TestCase):
 		('batiment', [('b', 'b'), ('a', 'a'), ('t', 't'), ('i', 'i'), ('m', 'm'), ('a~', 'en'), ('#', 't')]),
 		('aimaient', [('e^_comp', 'ai'), ('m', 'm'), ('e^_comp', 'ai'), ('verb_3p', 'ent')]),
 		('clef', [('k', 'c'), ('l', 'l'), ('e_comp', 'ef')]),
-		('hier', [('#', 'h'), ('j', 'i'), ('e^_comp', 'e'), ('r', 'r')]),
+		('hier', [('#', 'h'), ('j_e^_comp', 'ie'), ('r', 'r')]),
 		('femme', [('f', 'f'), ('a', 'e'), ('m', 'mm'), ('q_caduc', 'e')]),
 		('lemme', [('l', 'l'), ('e^_comp', 'e'), ('m', 'mm'), ('q_caduc', 'e')]),
 		('emmener', [('a~', 'em'), ('m', 'm'), ('q', 'e'), ('n', 'n'), ('e_comp', 'er')]),
 		('copient', [('k', 'c'), ('o', 'o'), ('p', 'p'), ('i', 'i'), ('#', 'ent')]),
-		('chien', [('s^', 'ch'), ('j', 'i'), ('e~', 'en')]),
+		('chien', [('s^', 'ch'), ('j_e~', 'ien')]),
 		('aimez', [('e^_comp', 'ai'), ('m', 'm'), ('e_comp', 'ez')]),
 		('aimer', [('e^_comp', 'ai'), ('m', 'm'), ('e_comp', 'er')]),
-		('pied', [('p', 'p'), ('j', 'i'), ('e_comp', 'ed')]),
+		('pied', [('p', 'p'), ('j_e_comp', 'ied')]),
 		('pique', [('p', 'p'), ('i', 'i'), ('k_qu', 'qu'), ('q_caduc', 'e')]),
 		('figue', [('f', 'f'), ('i', 'i'), ('g_u', 'gu'), ('q_caduc', 'e')]),
 		('je', [('z^', 'j'), ('q', 'e')]),
 		('mes', [('m', 'm'), ('e_comp', 'es')]),
 		('rein', [('r', 'r'), ('e~', 'ein')]),
 		('eu', [('y', 'eu')]),
-		('monsieur', [('m', 'm'), ('q', 'on'), ('s', 's'), ('j', 'i'), ('x^', 'eu'), ('#', 'r')]),
+		('monsieur', [('m', 'm'), ('q', 'on'), ('s', 's'), ('j_x^', 'ieu'), ('#', 'r')]),
 		('jeudi', [('z^', 'j'), ('x^', 'eu'), ('d', 'd'), ('i', 'i')]),
 		('jeune', [('z^', 'j'), ('x', 'eu'), ('n', 'n'), ('q_caduc', 'e')]),
 		('leur', [('l', 'l'), ('x', 'eu'), ('r', 'r')]),
@@ -179,7 +179,7 @@ class TestMotsRegleE(unittest.TestCase):
 		('et', [('e_comp', 'et')]),
 		('soleil', [('s', 's'), ('o', 'o'), ('l', 'l'), ('e^_comp', 'e'), ('j', 'il')]),
 		('geyser', [('z^_g', 'g'), ('e^_comp', 'ey'), ('z_s', 's'), ('e^_comp', 'e'), ('r', 'r')]),
-		('miel', [('m', 'm'), ('j', 'i'), ('e^_comp', 'e'), ('l', 'l')]),
+		('miel', [('m', 'm'), ('j_e^_comp', 'ie'), ('l', 'l')]),
 		('sec', [('s', 's'), ('e^_comp', 'e'), ('k', 'c')]),
 		('ennemi', [('e^_comp', 'e'), ('n', 'nn'), ('q', 'e'), ('m', 'm'), ('i', 'i')]),
 		('ennui', [('a~', 'en'), ('n', 'n'), ('y', 'u'), ('i', 'i')]),
@@ -262,11 +262,11 @@ class TestMotsRegleI(unittest.TestCase):
 		('tranquille', [('t', 't'), ('r', 'r'), ('a~', 'an'), ('k_qu', 'qu'), ('i', 'i'), ('l', 'll'), ('q_caduc', 'e')]),
 		('appuient', [('a', 'a'), ('p', 'pp'), ('y', 'u'), ('i', 'i'), ('#', 'ent')]),
 		('confient', [('k', 'c'), ('o~', 'on'), ('f', 'f'), ('i', 'i'), ('#', 'ent')]),
-		('copier', [('k', 'c'), ('o', 'o'), ('p', 'p'), ('j', 'i'), ('e_comp', 'er')]),
-		('pion', [('p', 'p'), ('j', 'i'), ('o~', 'on')]),
-		('chien', [('s^', 'ch'), ('j', 'i'), ('e~', 'en')]),
-		('cyan', [('s_c', 'c'), ('j', 'y'), ('a~', 'an')]),
-		('criant', [('k', 'c'), ('r', 'r'), ('j', 'i'), ('a~', 'an'), ('#', 't')]),
+		('copier', [('k', 'c'), ('o', 'o'), ('p', 'p'), ('j_e_comp', 'ier')]),
+		('pion', [('p', 'p'), ('j_o~', 'ion')]),
+		('chien', [('s^', 'ch'), ('j_e~', 'ien')]),
+		('cyan', [('s_c', 'c'), ('j_a~', 'yan')]),
+		('criant', [('k', 'c'), ('r', 'r'), ('i', 'i'), ('a~', 'an'), ('#', 't')]),
 		('maïs', [('m', 'm'), ('a', 'a'), ('i', 'ï'), ('#', 's')]),
 		('mistigri', [('m', 'm'), ('i', 'i'), ('s', 's'), ('t', 't'), ('i', 'i'), ('g', 'g'), ('r', 'r'), ('i', 'i')])
 		]
@@ -357,7 +357,7 @@ class TestMotsRegleO(unittest.TestCase):
 		('clown', [('k', 'c'), ('l', 'l'), ('u', 'ow'), ('n', 'n')]),
 		('bon', [('b', 'b'), ('o~', 'on')]),
 		('zoo', [('z', 'z'), ('o', 'oo')]),
-		('coefficient', [('k', 'c'), ('o', 'o'), ('e^_comp', 'e'), ('f', 'ff'), ('i', 'i'), ('s_c', 'c'), ('j', 'i'), ('a~', 'en'), ('#', 't')]),
+		('coefficient', [('k', 'c'), ('o', 'o'), ('e^_comp', 'e'), ('f', 'ff'), ('i', 'i'), ('s_c', 'c'), ('j_a~', 'ien'), ('#', 't')]),
 		('moelle', [('m', 'm'), ('wa', 'oe'), ('l', 'll'), ('q_caduc', 'e')]),
 		('foetus', [('f', 'f'), ('e', 'oe'), ('t', 't'), ('y', 'u'), ('#', 's')]),
 		('oeil', [('x', 'oe'), ('j', 'il')]),
@@ -412,8 +412,8 @@ class TestMotsRegleQ(unittest.TestCase):
 class TestMotsRegleR(unittest.TestCase):
 	def setUp(self):
 		self.mots = [
-		('monsieur', [('m', 'm'), ('q', 'on'), ('s', 's'), ('j', 'i'), ('x^', 'eu'), ('#', 'r')]),
-		('messieurs', [('m', 'm'), ('e^_comp', 'e'), ('s', 'ss'), ('j', 'i'), ('x^', 'eu'), ('#', 'r'), ('#', 's')]),
+		('monsieur', [('m', 'm'), ('q', 'on'), ('s', 's'), ('j_x^', 'ieu'), ('#', 'r')]),
+		('messieurs', [('m', 'm'), ('e^_comp', 'e'), ('s', 'ss'), ('j_x^', 'ieu'), ('#', 'r'), ('#', 's')]),
 		('gars', [('g', 'g'), ('a', 'a'), ('#', 'rs')]),
 		('gare', [('g', 'g'), ('a', 'a'), ('r', 'r'), ('q_caduc', 'e')])
 		]
@@ -452,12 +452,12 @@ class TestMotsRegleT(unittest.TestCase):
 	def setUp(self):
 		self.mots = [
 		('titi', [('t', 't'), ('i', 'i'), ('t', 't'), ('i', 'i')]),
-		('soutien', [('s', 's'), ('u', 'ou'), ('t', 't'), ('j', 'i'), ('e~', 'en')]),
-		('martien', [('m', 'm'), ('a', 'a'), ('r', 'r'), ('s_t', 't'), ('j', 'i'), ('e~', 'en')]),
+		('soutien', [('s', 's'), ('u', 'ou'), ('t', 't'), ('j_e~', 'ien')]),
+		('martien', [('m', 'm'), ('a', 'a'), ('r', 'r'), ('s_t', 't'), ('j_e~', 'ien')]),
 		('soulocratie', [('s', 's'), ('u', 'ou'), ('l', 'l'), ('o_ouvert', 'o'), ('k', 'c'), ('r', 'r'), ('a', 'a'), ('s_t', 't'), ('i', 'i'), ('#', 'e')]),
 		('vingt', [('v', 'v'), ('e~', 'in'), ('#', 'g'), ('t', 't')]),
-		('addition', [('a', 'a'), ('d', 'dd'), ('i', 'i'), ('s_t', 't'), ('j', 'i'), ('o~', 'on')]),
-		('yaourt', [('j', 'y'), ('a', 'a'), ('u', 'ou'), ('r', 'r'), ('t', 't')]),
+		('addition', [('a', 'a'), ('d', 'dd'), ('i', 'i'), ('s_t', 't'), ('j_o~', 'ion')]),
+		('yaourt', [('j_a', 'ya'), ('u', 'ou'), ('r', 'r'), ('t', 't')]),
 		('test', [('t', 't'), ('e^_comp', 'e'), ('s', 's'), ('t', 't')]),
 		('marrant', [('m', 'm'), ('a', 'a'), ('r', 'rr'), ('a~', 'an'), ('#', 't')]),
 		('instinct', [('e~', 'in'), ('s', 's'), ('t', 't'), ('e~', 'in'), ('#', 'c'), ('#', 't')]),
@@ -530,7 +530,7 @@ class TestMotsRegleX(unittest.TestCase):
 		('axe', [('a', 'a'), ('ks', 'x'), ('q_caduc', 'e')]),
 		('fixer', [('f', 'f'), ('i', 'i'), ('ks', 'x'), ('e_comp', 'er')]),
 		('boxe', [('b', 'b'), ('o', 'o'), ('ks', 'x'), ('q_caduc', 'e')]),
-		('xavier', [('gz', 'x'), ('a', 'a'), ('v', 'v'), ('j', 'i'), ('e_comp', 'er')]),
+		('xavier', [('gz', 'x'), ('a', 'a'), ('v', 'v'), ('j_e_comp', 'ier')]),
 		('exigu', [('e^', 'e'), ('gz', 'x'), ('i', 'i'), ('g_u', 'gu')]),
 		('exact', [('e^', 'e'), ('gz', 'x'), ('a', 'a'), ('k', 'c'), ('t', 't')]),
 		('hexagone', [('#', 'h'), ('e^', 'e'), ('gz', 'x'), ('a', 'a'), ('g', 'g'), ('o_ouvert', 'o'), ('n', 'n'), ('q_caduc', 'e')]),
@@ -551,7 +551,7 @@ class TestMotsRegleY(unittest.TestCase):
 	def setUp(self):
 		self.mots = [
 		('abbaye', [('a', 'a'), ('b', 'bb'), ('e^_comp', 'a'), ('i', 'y'), ('#', 'e')]),
-		('voyage', [('v', 'v'), ('wa', 'o'), ('j', 'y'), ('a', 'a'), ('z^_g', 'g'), ('q_caduc', 'e')]),
+		('voyage', [('v', 'v'), ('wa', 'o'), ('j_a', 'ya'), ('z^_g', 'g'), ('q_caduc', 'e')]),
 		('pays', [('p', 'p'), ('e^_comp', 'a'), ('i', 'y'), ('#', 's')]),
 		('synchroniser', [('s', 's'), ('e~', 'yn'), ('k', 'ch'), ('r', 'r'), ('o', 'o'), ('n', 'n'), ('i', 'i'), ('z_s', 's'), ('e_comp', 'er')]),
 		('gymnaste', [('z^_g', 'g'), ('i', 'y'), ('m', 'm'), ('n', 'n'), ('a', 'a'), ('s', 's'), ('t', 't'), ('q_caduc', 'e')]),
@@ -592,18 +592,18 @@ class TestSyllabesMots1(unittest.TestCase):
 		('friser', [('f', 'f'), ('r', 'r'), ('i', 'i'), ('z_s', 's'), ('e_comp', 'er')]),
 		('éponge', [('e', 'é'), ('p', 'p'), ('o~', 'on'), ('z^_g', 'g'), ('q_caduc', 'e')]),
 		('talon', [('t', 't'), ('a', 'a'), ('l', 'l'), ('o~', 'on')]),
-		('copieur', [('k', 'c'), ('o', 'o'), ('p', 'p'), ('j', 'i'), ('x', 'eu'), ('r', 'r')]),
+		('copieur', [('k', 'c'), ('o', 'o'), ('p', 'p'), ('j_x', 'ieu'), ('r', 'r')]),
 		('adresse', [('a', 'a'), ('d', 'd'), ('r', 'r'), ('e^_comp', 'e'), ('s', 'ss'), ('q_caduc', 'e')]),
 		('abri', [('a', 'a'), ('b', 'b'), ('r', 'r'), ('i', 'i')]),
 		('matin', [('m', 'm'), ('a', 'a'), ('t', 't'), ('e~', 'in')]),
 		('fumer', [('f', 'f'), ('y', 'u'), ('m', 'm'), ('e_comp', 'er')]),
 		('appel', [('a', 'a'), ('p', 'pp'), ('e^_comp', 'e'), ('l', 'l')]),
 		('soleil', [('s', 's'), ('o', 'o'), ('l', 'l'), ('e^_comp', 'e'), ('j', 'il')]),
-		('meilleur', [('m', 'm'), ('e^_comp', 'e'), ('j', 'ill'), ('x', 'eu'), ('r', 'r')]),
+		('meilleur', [('m', 'm'), ('e^_comp', 'e'), ('j_x', 'illeu'), ('r', 'r')]),
 		('approche', [('a', 'a'), ('p', 'pp'), ('r', 'r'), ('o_ouvert', 'o'), ('s^', 'ch'), ('q_caduc', 'e')]),
 		('sonnerie', [('s', 's'), ('o', 'o'), ('n', 'nn'), ('q', 'e'), ('r', 'r'), ('i', 'i'), ('#', 'e')]),
 		('avenue', [('a', 'a'), ('v', 'v'), ('q', 'e'), ('n', 'n'), ('y', 'u'), ('#', 'e')]),
-		('explosion', [('e^', 'e'), ('ks', 'x'), ('p', 'p'), ('l', 'l'), ('o', 'o'), ('z_s', 's'), ('j', 'i'), ('o~', 'on')]),
+		('explosion', [('e^', 'e'), ('ks', 'x'), ('p', 'p'), ('l', 'l'), ('o', 'o'), ('z_s', 's'), ('j_o~', 'ion')]),
 		('piloter', [('p', 'p'), ('i', 'i'), ('l', 'l'), ('o', 'o'), ('t', 't'), ('e_comp', 'er')]),
 		('rétablir', [('r', 'r'), ('e', 'é'), ('t', 't'), ('a', 'a'), ('b', 'b'), ('l', 'l'), ('i', 'i'), ('r', 'r')])
 		]
@@ -665,14 +665,14 @@ class TestSyllabesMots2(unittest.TestCase):
 		('écho', [('e', 'é'), ('s^', 'ch'), ('o', 'o')]),
 		('automne', [('o_comp', 'au'), ('t', 't'), ('o', 'o'), ('#', 'm'), ('n', 'n'), ('q_caduc', 'e')]),
 		('mille', [('m', 'm'), ('i', 'i'), ('l', 'll'), ('q_caduc', 'e')]),
-		('septième', [('s', 's'), ('e^_comp', 'e'), ('p', 'p'), ('t', 't'), ('j', 'i'), ('e^', 'è'), ('m', 'm'), ('q_caduc', 'e')]),
+		('septième', [('s', 's'), ('e^_comp', 'e'), ('p', 'p'), ('t', 't'), ('j_e^', 'iè'), ('m', 'm'), ('q_caduc', 'e')]),
 		('fusil', [('f', 'f'), ('y', 'u'), ('z_s', 's'), ('i', 'i'), ('#', 'l')]),
 		('orchestre', [('o_ouvert', 'o'), ('r', 'r'), ('k', 'ch'), ('e^_comp', 'e'), ('s', 's'), ('t', 't'), ('r', 'r'), ('q_caduc', 'e')]),
 		('hiver', [('#', 'h'), ('i', 'i'), ('v', 'v'), ('e_comp', 'er')]),
 		('examen', [('e^', 'e'), ('gz', 'x'), ('a', 'a'), ('m', 'm'), ('e~', 'en')]),
 		('second', [('s', 's'), ('q', 'e'), ('k', 'c'), ('o~', 'on'), ('#', 'd')]),
 		('parasol', [('p', 'p'), ('a', 'a'), ('r', 'r'), ('a', 'a'), ('s', 's'), ('o', 'o'), ('l', 'l')]),
-		('monsieur', [('m', 'm'), ('q', 'on'), ('s', 's'), ('j', 'i'), ('x^', 'eu'), ('#', 'r')]),
+		('monsieur', [('m', 'm'), ('q', 'on'), ('s', 's'), ('j_x^', 'ieu'), ('#', 'r')]),
 		('révolver', [('r', 'r'), ('e', 'é'), ('v', 'v'), ('o_ouvert', 'o'), ('l', 'l'), ('v', 'v'), ('e^_comp', 'e'), ('r', 'r')])
 		]
 
