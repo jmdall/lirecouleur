@@ -1034,10 +1034,12 @@ autom = {
             'nisole':[{'+':r"$",'-':r"^"},'n',1], ## exemple : n'a
             'apostrophe':[{'+':r"(\'|\’)"},'n',2] ## apostrophe
             }],
-    'o' : [['in','oignon','i','tomn','monsieur','n','m','nm','y1','y2','u','o','oe_0','oe_1','oe_2', 'oe_3','voeux','oeufs','noeud','oeu_defaut','oe_defaut'],
+    'o' : [['in','oignon','i','ouat','tomn','monsieur','n','m','nm','y1','y2','u','o','oe_0','oe_1','oe_2', 'oe_3',
+            'voeux','oeufs','noeud','oeu_defaut','oe_defaut'],
             {'in':[{'+':r"i[nm]"},'w5',3],
             'oignon':[{'-':r"^",'+':r"ignon"},'o',2],
             'i':[{'+':u(r"(i|î)")},'wa',2],
+            'ouat':[{'+':u(r"uat")},'wa',3],
             'u':[{'+':u(r"[uwûù]")},'u',2], ## son [u] : clou, clown
             'tomn':[{'-':r"t",'+':r"mn"},'o',1], ## regle spécifique pour 'automne' et ses dérivés
             'monsieur':[{'-':r"m",'+':r"nsieur"},'q',2],
