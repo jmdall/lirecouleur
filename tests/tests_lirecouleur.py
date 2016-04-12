@@ -37,7 +37,7 @@ class TestSonsIsoles(unittest.TestCase):
 		[('a~', 'en')], [('a~', 'an')], [('a~', 'am')], [('x~', 'un')],
 		[('x~', 'um')], [('e~', 'in')], [('e~', 'im')], [('e', u('é'))], [('e_comp', 'er')],
 		[('e_comp', 'ez')], [('e_comp', 'et')], [('e^', u('è'))], [('e^_comp', 'est')],
-		[('e_comp', 'ai')], [('e^_comp', 'ei')], [('wa', 'oi')], [('w5', 'oin')]]
+		[('e_comp', 'ai')], [('e^_comp', 'ei')], [('wa', 'oi')], [('w_e~', 'oin')]]
 	
 		self.consonnes = [[('b', 'b')], [('s_c', 'c')], [('d', 'd')], [('f', 'f')],
 		[('g', 'g')], [('#', 'h')], [('i', 'i')], [('z^', 'j')], [('k', 'k')], [('l', 'l')],
@@ -214,7 +214,7 @@ class TestMotsRegleG(unittest.TestCase):
 		('gomme', [('g', 'g'), ('o_ouvert', 'o'), ('m', 'mm'), ('q_caduc', 'e')]),
 		('gypse', [('z^_g', 'g'), ('i', 'y'), ('p', 'p'), ('s', 's'), ('q_caduc', 'e')]),
 		('geste', [('z^_g', 'g'), ('e^_comp', 'e'), ('s', 's'), ('t', 't'), ('q_caduc', 'e')]),
-		('poing', [('p', 'p'), ('w5', 'oin'), ('#', 'g')]),
+		('poing', [('p', 'p'), ('w_e~', 'oin'), ('#', 'g')]),
 		('doigt', [('d', 'd'), ('wa', 'oi'), ('#', 'g'), ('#', 't')]),
 		('gourd', [('g', 'g'), ('u', 'ou'), ('r', 'r'), ('#', 'd')]),
 		('sang', [('s', 's'), ('a~', 'an'), ('#', 'g')]),
@@ -351,7 +351,7 @@ class TestMotsRegleN(unittest.TestCase):
 class TestMotsRegleO(unittest.TestCase):
 	def setUp(self):
 		self.mots = [
-		('coin', [('k', 'c'), ('w5', 'oin')]),
+		('coin', [('k', 'c'), ('w_e~', 'oin')]),
 		('roi', [('r', 'r'), ('wa', 'oi')]),
 		('clou', [('k', 'c'), ('l', 'l'), ('u', 'ou')]),
 		('clown', [('k', 'c'), ('l', 'l'), ('u', 'ow'), ('n', 'n')]),
@@ -510,9 +510,9 @@ class TestMotsRegleW(unittest.TestCase):
 	def setUp(self):
 		self.mots = [
 		('wagon', [('v', 'w'), ('a', 'a'), ('g', 'g'), ('o~', 'on')]),
-		('kiwi', [('k', 'k'), ('i', 'i'), ('w', 'w'), ('i', 'i')]),
-		('wapiti', [('w', 'w'), ('a', 'a'), ('p', 'p'), ('i', 'i'), ('t', 't'), ('i', 'i')]),
-		('sandwich', [('s', 's'), ('a~', 'an'), ('d', 'd'), ('w', 'w'), ('i', 'i'), ('s^', 'ch')])
+		('kiwi', [('k', 'k'), ('i', 'i'), ('w_i', 'wi')]),
+		('wapiti', [('wa', 'wa'), ('p', 'p'), ('i', 'i'), ('t', 't'), ('i', 'i')]),
+		('sandwich', [('s', 's'), ('a~', 'an'), ('d', 'd'), ('w_i', 'wi'), ('s^', 'ch')])
 		]
 
 	def test_mots(self):

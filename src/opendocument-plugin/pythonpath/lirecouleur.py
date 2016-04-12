@@ -116,9 +116,10 @@ def handleMaskPhonems():
             pass
     
     # considérer que la sélection des phonèmes 'voyelle' s'étend à 'yod'+'voyelle'
-    for phon in ['a', 'a~', 'e', 'e^', 'e_comp', 'e^_comp', 'o', 'o~', 'e~', 'x', 'x^']:
+    for phon in ['a', 'a~', 'e', 'e^', 'e_comp', 'e^_comp', 'o', 'o~', 'i', 'e~', 'x', 'x^', 'u']:
         try:
             selectphonemes['j_'+phon] = selectphonemes[phon]
+            selectphonemes['w_'+phon] = selectphonemes[phon]
         except:
             pass
 
@@ -873,8 +874,9 @@ autom = {
  ## + tous les *nc sauf "onc" et "donc"
     u('ç') : [[],
             {'*':[{},'s',1]}],
-    'd' : [['d','aujourdhui','disole','dmuet','apostrophe'],
+    'd' : [['d','aujourdhui','disole','except','dmuet','apostrophe'],
             {'d':[{'+':r"d"},'d',2],
+            'except':[{'-':u(r"(aï|oue)"), '+':r"(s?)$"},'d',1], ## aïd, caïd, oued
             'aujourdhui':[{'-':r"aujour"},'d',1], ## aujourd'hui
             'disole':[{'+':r"$",'-':r"^"},'d',1], ## exemple : d'abord
             'dmuet':[{'+':r"(s?)$"},'#',1], ## un d suivi éventuellement d'un s ex. : retards
@@ -1034,11 +1036,13 @@ autom = {
             'nisole':[{'+':r"$",'-':r"^"},'n',1], ## exemple : n'a
             'apostrophe':[{'+':r"(\'|\’)"},'n',2] ## apostrophe
             }],
-    'o' : [['in','oignon','i','ouat','tomn','monsieur','n','m','nm','y1','y2','u','o','oe_0','oe_1','oe_2', 'oe_3',
-            'voeux','oeufs','noeud','oeu_defaut','oe_defaut'],
-            {'in':[{'+':r"i[nm]"},'w5',3],
+    'o' : [['in','oignon','i','ouat','oui','oue','tomn','monsieur','n','m','nm','y1','y2','u','o','oe_0',
+            'oe_1','oe_2', 'oe_3','voeux','oeufs','noeud','oeu_defaut','oe_defaut'],
+            {'in':[{'+':r"i[nm]"},'w_e~',3],
             'oignon':[{'-':r"^",'+':r"ignon"},'o',2],
             'i':[{'+':u(r"(i|î)")},'wa',2],
+            'oue':[{'-':r"^",'+':u(r"ue")},'w_e^_comp',3], # ouest, oued
+            'oui':[{'-':r"^",'+':u(r"ui")},'w_i',3], # oui
             'ouat':[{'+':u(r"uat")},'wa',3],
             'u':[{'+':u(r"[uwûù]")},'u',2], ## son [u] : clou, clown
             'tomn':[{'-':r"t",'+':r"mn"},'o',1], ## regle spécifique pour 'automne' et ses dérivés
@@ -1138,10 +1142,12 @@ autom = {
             {'*':[{},'y',1]}],
     'v' : [[],
             {'*':[{},'v',1]}],
-    'w' : [['wurt','wisig','wag'],
+    'w' : [['wurt','wisig','wag','wa', 'wi'],
             {'wurt':[{'+':r"urt"},'v',1], # saucisse
             'wisig':[{'+':r"isig"},'v',1], # wisigoth
             'wag':[{'+':r"ag"},'v',1], # wagons et wagnérien
+            'wa':[{'+':r"a"},'wa',2], # watt, wapiti, etc.
+            'wi':[{'+':r"i"},'w_i',2], # kiwi
             '*':[{},'w',1]}],
     'x' : [['six_dix','gz_1','gz_2','gz_3','gz_4','gz_5','_aeox','fix','_ix'],
             {'six_dix':[{'-':r"(s|d)i"},'s_x',1],
@@ -1413,7 +1419,7 @@ def post_traitement_yod(pp):
             return pp
         
         # phonème suivant
-        phon_suivant = ['a', 'a~', 'e', 'e^', 'e_comp', 'e^_comp', 'o', 'o~', 'e~', 'x', 'x^']
+        phon_suivant = ['a', 'a~', 'e', 'e^', 'e_comp', 'e^_comp', 'o', 'o~', 'e~', 'x', 'x^', 'u']
         if phonemes[i_ph+1] in phon_suivant and len(pp[i_ph][1]) == 1:
             pp[i_ph] = ('j_'+phonemes[i_ph+1], pp[i_ph][1]+pp[i_ph+1][1])
             if len(pp[i_ph+2:]) > 0:

@@ -542,6 +542,39 @@ __style_yod__ = {
         'x^':{'CharColor':__style_phon_perso__['x^']['CharColor'], 'CharUnderline':11}
         }
 
+style_wau = {
+        'a':{'CharStyleName':'wau_phon_a'},
+        'i':{'CharStyleName':'wau_phon_i'},
+        'e':{'CharStyleName':'wau_phon_ez'},
+        'e_comp':{'CharStyleName':'wau_phon_ez_comp'},
+        'e^':{'CharStyleName':'wau_phon_et'},
+        'e^_comp':{'CharStyleName':'wau_phon_et_comp'},
+        'a~':{'CharStyleName':'wau_phon_an'},
+        'e~':{'CharStyleName':'wau_phon_in'},
+        'x~':{'CharStyleName':'wau_phon_un'},
+        'o~':{'CharStyleName':'wau_phon_on'},
+        'x^':{'CharStyleName':'wau_phon_eu'}
+        }
+
+__style_wau__ = {
+        'a':{'CharColor':__style_phon_perso__['a']['CharColor'], 'CharUnderline':12},
+        'i':{'CharColor':__style_phon_perso__['i']['CharColor'], 'CharUnderline':12},
+        'e':{'CharColor':__style_phon_perso__['e']['CharColor'], 'CharUnderline':12},
+        'e_comp':{'CharColor':__style_phon_perso__['e_comp']['CharColor'], 'CharUnderline':12},
+        'e^':{'CharColor':__style_phon_perso__['e^']['CharColor'], 'CharUnderline':11},
+        'e^_comp':{'CharColor':__style_phon_perso__['e^_comp']['CharColor'], 'CharUnderline':12},
+        'a~':{'CharColor':__style_phon_perso__['a~']['CharColor'], 'CharUnderline':12},
+        'e~':{'CharColor':__style_phon_perso__['e~']['CharColor'], 'CharUnderline':12},
+        'x~':{'CharColor':__style_phon_perso__['x~']['CharColor'], 'CharUnderline':12},
+        'o~':{'CharColor':__style_phon_perso__['o~']['CharColor'], 'CharUnderline':12},
+        'x^':{'CharColor':__style_phon_perso__['x^']['CharColor'], 'CharUnderline':12}
+        }
+
+style_semi = {
+        'j' : style_yod,
+        'w' : style_wau
+        }
+
 ######################################################################################
 #
 ######################################################################################
@@ -694,6 +727,7 @@ def importStylesLireCouleur(xModel):
         createCharacterStyles(xModel, style_syll_dys, __style_syll_dys__)
         createCharacterStyles(xModel, styles_lignes_altern, __styles_lignes_altern__)
         createCharacterStyles(xModel, style_yod, __style_yod__)
+        createCharacterStyles(xModel, style_wau, __style_wau__)
 
         if not handleStyle("style_syll_souligne"):
             try:
@@ -1781,8 +1815,12 @@ def code_phonemes(xDocument, phonemes, style, cursor, selecteurphonemes=None, de
                 else:
                     if stylphon.startswith('j_') or stylphon.startswith('w_') or stylphon.startswith('y_'):
                         # appliquer le style de la voyelle avec marquage de la semi-voyelle sur la première lettre
-                        cur = formaterTexte(txt_phon[0], cur, style_yod[stylphon[2:]])
-                        txt_phon = txt_phon[1:]
+                        il = 1
+                        if stylphon.startswith('w_') and txt_phon.startswith('ou'):
+                            # micmac pour savoir s'il faut souligner une ou 2 lettres
+                            il = 2
+                        cur = formaterTexte(txt_phon[:il], cur, style_semi[stylphon[0]][stylphon[2:]])
+                        txt_phon = txt_phon[il:]
                         stylphon = stylphon[2:]
                     if stylphon in styles_phonemes[style]:
                         # appliquer le style demandé
