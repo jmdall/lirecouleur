@@ -502,6 +502,46 @@ __style_syll_dys__ = {
         '3': {'CharColor':0x0000ff00}
         }
 
+style_yod = {
+        'a':{'CharStyleName':'yod_phon_a'},
+        'q':{'CharStyleName':'yod_phon_e'},
+        'i':{'CharStyleName':'yod_phon_i'},
+        'o':{'CharStyleName':'yod_phon_o'},
+        'o_comp':{'CharStyleName':'yod_phon_o_comp'},
+        'o_ouvert':{'CharStyleName':'yod_phon_o_ouvert'},
+        'u':{'CharStyleName':'yod_phon_ou'},
+        'e':{'CharStyleName':'yod_phon_ez'},
+        'e_comp':{'CharStyleName':'yod_phon_ez_comp'},
+        'e^':{'CharStyleName':'yod_phon_et'},
+        'e^_comp':{'CharStyleName':'yod_phon_et_comp'},
+        'a~':{'CharStyleName':'yod_phon_an'},
+        'e~':{'CharStyleName':'yod_phon_in'},
+        'x~':{'CharStyleName':'yod_phon_un'},
+        'o~':{'CharStyleName':'yod_phon_on'},
+        'x':{'CharStyleName':'yod_phon_oe'},
+        'x^':{'CharStyleName':'yod_phon_eu'}
+        }
+
+__style_yod__ = {
+        'a':{'CharColor':__style_phon_perso__['a']['CharColor'], 'CharUnderline':11},
+        'a~':{'CharColor':__style_phon_perso__['a~']['CharColor'], 'CharUnderline':11},
+        'q':{'CharColor':__style_phon_perso__['q']['CharColor'], 'CharUnderline':11},
+        'i':{'CharColor':__style_phon_perso__['i']['CharColor'], 'CharUnderline':11},
+        'e~':{'CharColor':__style_phon_perso__['e~']['CharColor'], 'CharUnderline':11},
+        'o':{'CharColor':__style_phon_perso__['o']['CharColor'], 'CharUnderline':11},
+        'o_comp':{'CharColor':__style_phon_perso__['o_comp']['CharColor'], 'CharUnderline':11},
+        'o_ouvert':{'CharColor':__style_phon_perso__['o_ouvert']['CharColor'], 'CharUnderline':11},
+        'o~':{'CharColor':__style_phon_perso__['o~']['CharColor'], 'CharUnderline':11},
+        'u':{'CharColor':__style_phon_perso__['u']['CharColor'], 'CharUnderline':11},
+        'x~':{'CharColor':__style_phon_perso__['x~']['CharColor'], 'CharUnderline':11},
+        'e':{'CharColor':__style_phon_perso__['e']['CharColor'], 'CharUnderline':11},
+        'e_comp':{'CharColor':__style_phon_perso__['e_comp']['CharColor'], 'CharUnderline':11},
+        'e^':{'CharColor':__style_phon_perso__['e^']['CharColor'], 'CharUnderline':11},
+        'e^_comp':{'CharColor':__style_phon_perso__['e^_comp']['CharColor'], 'CharUnderline':11},
+        'x':{'CharColor':__style_phon_perso__['x']['CharColor'], 'CharUnderline':11},
+        'x^':{'CharColor':__style_phon_perso__['x^']['CharColor'], 'CharUnderline':11}
+        }
+
 ######################################################################################
 #
 ######################################################################################
@@ -653,6 +693,7 @@ def importStylesLireCouleur(xModel):
         createCharacterStyles(xModel, style_phon_complexes, __style_phon_complexes__)
         createCharacterStyles(xModel, style_syll_dys, __style_syll_dys__)
         createCharacterStyles(xModel, styles_lignes_altern, __styles_lignes_altern__)
+        createCharacterStyles(xModel, style_yod, __style_yod__)
 
         if not handleStyle("style_syll_souligne"):
             try:
@@ -1677,24 +1718,32 @@ def formaterTexte(texte, ooocursor, choix_styl):
     lgr_texte = len(texte)
 
     # coloriage du phonème courant
+    ncurs = None
     try:
         ncurs = ooocursor.getText().createTextCursorByRange(ooocursor)
         ncurs.goRight(lgr_texte, True)
-        if choix_styl == "defaut":
+    except:
+        pass
+
+    if choix_styl == "defaut":
+        try:
             ncurs.setPropertyToDefault("CharStyleName")
             ncurs.setPropertyToDefault("ParaLineSpacing")
             ncurs.setPropertyToDefault("CharKerning")
             ncurs.setPropertyToDefault("CharHeight")
             ncurs.setPropertyToDefault("CharBackColor")
             #ncurs.setAllPropertiesToDefault()
-        elif choix_styl == "noir":
+        except:
+            pass
+    elif choix_styl == "noir":
+        try:
             ncurs.setPropertyToDefault("CharStyleName")
             ncurs.setPropertyToDefault("CharBackColor")
-        else:
-            setStyle(choix_styl, ncurs)
-        del ncurs
-    except:
-        pass
+        except:
+            pass
+    else:
+        setStyle(choix_styl, ncurs)
+    del ncurs
 
     # déplacer le curseur après le phonème courant
     return deplacerADroite(texte, ooocursor)
@@ -1730,6 +1779,11 @@ def code_phonemes(xDocument, phonemes, style, cursor, selecteurphonemes=None, de
                     # pas de style : déplacer simplement le curseur
                     cur = deplacerADroite(txt_phon, cur)
                 else:
+                    if stylphon.startswith('j_') or stylphon.startswith('w_') or stylphon.startswith('y_'):
+                        # appliquer le style de la voyelle avec marquage de la semi-voyelle sur la première lettre
+                        cur = formaterTexte(txt_phon[0], cur, style_yod[stylphon[2:]])
+                        txt_phon = txt_phon[1:]
+                        stylphon = stylphon[2:]
                     if stylphon in styles_phonemes[style]:
                         # appliquer le style demandé
                         cur = formaterTexte(txt_phon, cur, styles_phonemes[style][stylphon])
@@ -1739,16 +1793,6 @@ def code_phonemes(xDocument, phonemes, style, cursor, selecteurphonemes=None, de
                                 cur = marquePoint(xDocument, txt_phon, cur)
                             else:
                                 cur = marqueImage(xDocument, stylphon, txt_phon, cur)
-                    elif stylphon.startswith('j_') or stylphon.startswith('w_') or stylphon.startswith('y_'):
-                        # appliquer le style de la voyelle avec marquage de la semi-voyelle sur la première lettre
-                        cur = formaterTexte(txt_phon, cur, styles_phonemes[style][stylphon[2:]])
-                        cur.goLeft(len(txt_phon), False)
-                        cur = formaterTexte(txt_phon[0], cur, {'CharStyleName':'yod_'+styles_phonemes[style][stylphon[2:]]['CharStyleName']})
-                        if decos_phonomes and xDocument.supportsService("com.sun.star.text.TextDocument"):
-                            cur.goLeft(1, False)
-                            cur = marqueImage(xDocument, stylphon[2:], txt_phon, cur)
-                        else:
-                            cur.goRight(len(txt_phon)-1, False)
                     else:
                         # style non défini : appliquer le style par défaut
                         cur = formaterTexte(txt_phon, cur, 'defaut')
