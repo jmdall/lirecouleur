@@ -16,7 +16,7 @@
       </simple-license>
    </registration>
    <update-information>
-      <src xlink:href="http://www.arkaline.fr/downloads/LireCouleur.update.xml" />
+      <src xlink:href="http://lirecouleur.arkaline.fr/lirecouleur.update.xml" />
    </update-information>
    <display-name>
       <name lang="fr">LireCouleur : outils d&apos;aide à l&apos;apprentissage de la lecture</name>

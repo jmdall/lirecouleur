@@ -6,7 +6,7 @@
 # en syllabes.
 #
 # @author Marie-Pierre Brungard
-# @version 3.5
+# @version 3.5.2
 # @since 2015
 #
 # GNU General Public Licence (GPL) version 3
@@ -905,7 +905,7 @@ autom = {
             'except_en_1':[{'-':u(r"exam|mino|édu"),'+':r"n(s?)$"},'e~',2], ## exceptions des mots où le 'en' final se prononce [e~] (héritage latin)
             'except_en_2':[{'-':u(r"[ao]ï"),'+':r"n(s?)$"},'e~',2], ## païen, hawaïen, tolstoïen
             'een':[{'-':u(r"é"),'+':r"n(s?)$"},'e~',2], ## les mots qui se terminent par 'éen'
-            'ien':[{'-':r"[bdlmrstvh]i",'+':u(r"n([bcçdfghjklpqrstvwxz]|$)")},'e~',2], ## certains mots avec 'ien' => son [e~]
+            'ien':[{'-':r"[bcdlmrstvh]i",'+':u(r"n([bcçdfghjklpqrstvwxz]|$)")},'e~',2], ## certains mots avec 'ien' => son [e~]
             'nm':[{'+':r"[nm]$"},'a~',2],
             'drz_final':[{'+':r"[drz](s?)$"},'e_comp',2], ## e suivi d'un d,r ou z en fin de mot done le son [e]
             'que_isole':[{'-':r"^qu",'+':r"$"},'q',1], ## que isolé

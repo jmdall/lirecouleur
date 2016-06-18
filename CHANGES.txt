@@ -1,3 +1,8 @@
+Corrections :
+* modification de la règle 'ien' de la lettre "e" pour décoder correctement les mots terminés par "cien" comme batracien, mécanicien, etc.
+
+------------------------- 3.5.1------------------------- 
+
 Modifications :
 * prise en compte des sons composés comme 'ion', 'ien', 'ian' - référence : http://andre.thibault.pagesperso-orange.fr/PhonologieSemaine10.pdf
 
