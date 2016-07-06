@@ -1182,11 +1182,11 @@ LireCouleurEngine.prototype.extrairePhonemes = function(mot, para, p_para) {
 	// post traitement pour différencier les eu ouverts et les eu fermés
 	codage = this.post_traitement_e_ouvert_ferme(codage);
 
-	console.log('--------------------');
-    codage.forEach(function(element, i_ph, array) {
-		console.log(element.phoneme, element.lettres);
-	});
-	console.log('--------------------');
+	// console.log('--------------------');
+    // codage.forEach(function(element, i_ph, array) {
+	//	console.log(element.phoneme, element.lettres);
+	// });
+	// console.log('--------------------');
 
 	return codage;
 }
