@@ -3,7 +3,7 @@
  * Ce module fait partie du projet LireCouleur - http://lirecouleur.arkaline.fr
  * 
  * @author Marie-Pierre Brungard
- * @version 0.2
+ * @version 1
  * @since 2016
  *
  * GNU General Public Licence (GPL) version 3
@@ -89,7 +89,8 @@ LCPhoneme.prototype.estUneVoyelle = function() {
 }
 
 LCPhoneme.prototype.estSemiConsonne = function() {
-	return (syllaphon['s'].indexOf(this.phoneme) > -1);
+    // yod+voyelle, 'w'+voyelle, 'y'+voyelle sans diérèse
+    return (this.phoneme.startsWith('j_') || this.phoneme.startsWith('w_') || this.phoneme.startsWith('y_'));
 }
 
 LCPhoneme.prototype.estPhonemeMuet = function() {
@@ -97,7 +98,7 @@ LCPhoneme.prototype.estPhonemeMuet = function() {
 }
 
 LCPhoneme.prototype.estSemiVoyelle = function() {
-	return this.estSemiConsonne();
+	return (syllaphon['s'].indexOf(this.phoneme) > -1);
 }
 
 LCPhoneme.prototype.estConsonneRedoublee = function() {
@@ -198,8 +199,8 @@ function LireCouleurEngine() {
 	this.autom = {
 		'a' : [['u','il','in','nc_ai_fin','ai_fin','i','n','m','nm','y_except','y'],
 				{'n':[{'+':/n[bcçdfgjklmpqrstvwxz]/i},'a~',2],
-				'm':[{'+':/m[bcçdfgjklpqrstvwxz]/i},'a~',2], // toute consonne sauf le n
-				'nm':[{'+':/[nm]$/i},'a~',2],
+				'm':[{'+':/m[mbp]/i},'a~',2], // règle du m devant m, b, p
+				'nm':[{'+':/n(s?)$/i},'a~',2],
 				'y_except':[{'-':/(^b|cob|cip)/i,'+':/y/i},'a',1], // exception : baye, cobaye
 				'y':[{'+':/y/i},'e^_comp',1],
 				'u':[{'+':/u/i},'o_comp',2],
@@ -245,18 +246,19 @@ function LireCouleurEngine() {
 	 // + tous les *nc sauf "onc" et "donc"
 		'ç' : [[],
 				{'*':[{},'s',1]}],
-		'd' : [['d','aujourdhui','disole','dmuet','apostrophe'],
+		'd' : [['d','aujourdhui','disole','except','dmuet','apostrophe'],
 				{'d':[{'+':/d/i},'d',2],
+                'except':[{'-':/(aï|oue)/i, '+':/(s?)$/i},'d',1], // aïd, caïd, oued
 				'aujourdhui':[{'-':/aujour/i},'d',1], // aujourd'hui
 				'disole':[{'+':/$/i,'-':/^/i},'d',1], // exemple : d'abord
 				'dmuet':[{'+':/(s?)$/i},'#',1], // un d suivi éventuellement d'un s ex. : retards
 				'apostrophe':[{'+':/(\'|\’)/i},'d',2], // apostrophe
 				'*':[{},'d',1]}],
-		'e' : [['conj_v_ier','uient','ien','een','except_en','_ent','clef','hier','adv_emment_fin',
+		'e' : [['conj_v_ier','uient','ien','ien_2','een','except_en','_ent','clef','hier','adv_emment_fin',
 				'ment','imparfait','verbe_3_pluriel','au',
 				'avoir','monsieur','jeudi','jeu_','eur','eu','eu_accent_circ','in','eil','y','iy','ennemi','enn_debut_mot','dessus_dessous',
 				'et','cet','t_final','eclm_final','est','drz_final','n','adv_emment_a','femme','lemme','em_gene','nm','tclesmesdes',
-				'que_isole','que_gue_final','jtcnslemede','jean','ge','eoi','ex','reqquechose','2consonnes','abbaye','e_muet','e_caduc','e_deb'],
+				'que_isole','que_gue_final','jtcnslemede','jean','ge','eoi','ex','ef','reqquechose','2consonnes','abbaye','e_muet','e_caduc','e_deb'],
 				{'_ent':[this.regle_mots_ent,'a~',2], // quelques mots (adverbes ou noms) terminés par ent
 				'adv_emment_fin':[{'-':/emm/i,'+':/nt/i},'a~',2], // adverbe avec 'emment' => se termine par le son [a~]
 				'ment':[this.regle_ment,'a~',2], // on considère que les mots terminés par 'ment' se prononcent [a~] sauf s'il s'agit d'un verbe
@@ -274,7 +276,8 @@ function LireCouleurEngine() {
 				'conj_v_ier':[this.regle_ient,'#',3], // verbe du 1er groupe terminé par 'ier' conjugué à la 3ème pers du pluriel
 				'except_en':[{'-':/exam|mino|édu/i,'+':/n(s?)$/i},'e~',2], // exceptions des mots où le 'en' final se prononce [e~] (héritage latin)
 				'een':[{'-':/é/i,'+':/n(s?)$/i},'e~',2], // les mots qui se terminent par 'éen'
-				'ien':[{'-':/[bdlmrstvh]i/i,'+':/n([bcçdfghjklpqrstvwxz]|$)/i},'e~',2], // certains mots avec 'ien' => son [e~]
+				'ien':[{'-':/[bcdlmrstvh]i/i,'+':/n([bcçdfghjklpqrstvwxz]|$)/i},'e~',2], // certains mots avec 'ien' => son [e~]
+				'ien_2':[{'-':/ï/i,'+':/n([bcçdfghjklpqrstvwxz]|$)/i},'e~',2], // mots avec 'ïen' => son [e~]
 				'nm':[{'+':/[nm]$/i},'a~',2],
 				'drz_final':[{'+':/[drz](s?)$/i},'e_comp',2], // e suivi d'un d,r ou z en fin de mot done le son [e]
 				'que_isole':[{'-':/^qu/i,'+':/$/i},'q',1], // que isolé
@@ -300,6 +303,7 @@ function LireCouleurEngine() {
 				'ennemi':[{'-':/^/i,'+':/nnemi/i},'e^_comp',1], // ennemi est l'exception ou 'enn' en début de mot se prononce 'èn' (cf. enn_debut_mot)
 				'enn_debut_mot':[{'-':/^/i,'+':/nn/i},'a~',2], // 'enn' en début de mot se prononce 'en'
 				'ex':[{'+':/x/i},'e^',1], // e suivi d'un x se prononce è
+                'ef':[{'+':/[bf](s?)$/i},'e^',1], // e suivi d'un f ou d'un b en fin de mot se prononce è
 				'reqquechose':[{'-':/r/i,'+':/[bcçdfghjklmnpqrstvwxz](h|l|r)/i},'q',1], // re-quelque chose : le e se prononce 'e'
 				'dessus_dessous':[{'-':/d/i,'+':/ss(o?)us/i},'q',1], // dessus, dessous : 'e' = e
 				'2consonnes':[{'+':/[bcçdfghjklmnpqrstvwxz]{2}/i},'e^_comp',1], // e suivi de 2 consonnes se prononce è
@@ -342,12 +346,13 @@ function LireCouleurEngine() {
 				'*':[{},'g',1]}],
 		'h' : [[],
 				{'*':[{},'#',1]}],
-		'i' : [['ing','n','m','nm','lldeb','vill','mill','tranquille',
+		'i' : [['ing','n','m','nm','prec_2cons','lldeb','vill','mill','tranquille',
 				'ill','@ill','@il','ll','ui','ient_1','ient_2','ie','i_voyelle'],
 				{'ing':[{'-':/[bcçdfghjklmnpqrstvwxz]/i,'+':/ng$/i},'i',1],
 				'n':[{'+':/n[bcçdfghjklmpqrstvwxz]/i},'e~',2],
 				'm':[{'+':/m[bcçdfghjklnpqrstvwxz]/i},'e~',2],
 				'nm':[{'+':/[n|m]$/i},'e~',2],
+                'prec_2cons':[{'-':/[ptkcbdgfv][lr]/i},'i',1], // précédé de 2 consonnes (en position 3), doit apparaître comme [ij]
 				'lldeb':[{'-':/^/i,'+':/ll/i},'i',1],
 				'vill':[{'-':/v/i,'+':/ll/i},'i',1],
 				'mill':[{'-':/m/i,'+':/ll/i},'i',1],
@@ -362,8 +367,10 @@ function LireCouleurEngine() {
 				'ie':[{'+':/e(s|nt)?$/i},'i',1], // mots terminés par -ie(s|nt)
 				'i_voyelle':[{'+':/[aäâeéèêëoôöuù]/i},'j',1], // i suivi d'une voyelle donne [j]
 				'*':[{},'i',1]}],
-		'ï' : [[],
-				{'*':[{},'i',1]}],
+		'ï' : [['thai', 'aie'],
+				{'thai':[{'-':/t(h?)a/i},'j',1], // taï, thaï et dérivés
+                'aie':[{'-':/[ao]/i,'+':/e/i},'j',1], // païen et autres
+                '*':[{},'i',1]}],
 		'î' : [[],
 				{'*':[{},'i',1]}],
 		'j' : [[],
@@ -382,8 +389,9 @@ function LireCouleurEngine() {
 				'eil':[{'-':/e(u?)i/i},'j',1], // les mots terminés en 'eil' ou 'ueil' => son [j]
 				'apostrophe':[{'+':/(\'|\’)/i},'l',2], // apostrophe
 				'*':[{},'l',1]}],
-		'm' : [['m','tomn','misole','apostrophe'],
+		'm' : [['m','tomn','damn','misole','apostrophe'],
 				{'m':[{'+':/m/i},'m',2],
+				'damn':[{'-':/da/i,'+':/n/i},'#',1], // regle spécifique pour 'damné' et ses dérivés
 				'tomn':[{'-':/to/i,'+':/n/i},'#',1], // regle spécifique pour 'automne' et ses dérivés
 				'*':[{},'m',1],
 				'misole':[{'+':/$/i,'-':/^/i},'m',1], // exemple : m'a
@@ -401,10 +409,13 @@ function LireCouleurEngine() {
 				'nisole':[{'+':/$/i,'-':/^/i},'n',1], // exemple : n'a
 				'apostrophe':[{'+':/(\'|\’)/i},'n',2] // apostrophe
 				}],
-		'o' : [['in','oignon','i','tomn','monsieur','n','m','nm','y1','y2','u','o','oe_0','oe_1','oe_2', 'oe_3','voeux','oeufs','noeud','oeu_defaut','oe_defaut'],
-				{'in':[{'+':/i[nm]/i},'w5',3],
+		'o' : [['in','oignon','i','ouat','oui','oue','tomn','monsieur','n','m','nm','y1','y2','u','o','oe_0','oe_1','oe_2', 'oe_3','voeux','oeufs','noeud','oeu_defaut','oe_defaut'],
+				{'in':[{'+':/i[nm]/i},'w_e~',3],
 				'oignon':[{'-':/^/i,'+':/ignon/i},'o',2],
 				'i':[{'+':/(i|î)/i},'wa',2],
+                'oue':[{'-':/^/i,'+':/ue/i},'w_e^_comp',3], // ouest, oued
+                'oui':[{'-':/^/i,'+':/ui/i},'w_i',3], // oui
+                'ouat':[{'+':/uat/i},'wa',3],
 				'u':[{'+':/[uwûù]/i},'u',2], // son [u] : clou, clown
 				'tomn':[{'-':/t/i,'+':/mn/i},'o',1], // regle spécifique pour 'automne' et ses dérivés
 				'monsieur':[{'-':/m/i,'+':/nsieur/i},'q',2],
@@ -423,16 +434,20 @@ function LireCouleurEngine() {
 				'oe_2':[{'-':/m/i,'+':/e/i},'wa',2], // exemple : moelle
 				'oe_3':[{'-':/f/i,'+':/e/i},'e',2], // exemple : foetus
 				'oe_defaut':[{'+':/e/i},'x',2], // exemple : oeil
-				'*':[{},'o',1]}],
+				'*':[{},'o',1]
+                }],
 		'œ' : [['voeux','oeufs','noeud'],
 				{'voeux':[{'+':/ux/i},'x^',2], // voeux
 				'noeud':[{'+':/ud/i},'x^',2], // noeud
 				'oeufs':[{'+':/ufs/i},'x^',2], // traite oeufs et boeufs
-				'*':[{'+':/u/i},'x^',2]}],
+				'*':[{'+':/u/i},'x^',2]
+                }],
 		'ô' : [[],
-				{'*':[{},'o',1]}],
+				{'*':[{},'o',1]
+                    }],
 		'ö' : [[],
-				{'*':[{},'o',1]}],
+				{'*':[{},'o',1]
+                    }],
 		'p' : [['h','oup','drap','trop','sculpt','sirop','sgalop','rps','amp','compt','bapti','sept','p'],
 				{'p':[{'+':/p/i},'p',2],
 				'oup':[{'-':/[cl]ou/i,'+':/$/i},'#',1], // les exceptions avec un p muet en fin de mot : loup, coup
@@ -503,11 +518,13 @@ function LireCouleurEngine() {
 				{'*':[{},'y',1]}],
 		'v' : [[],
 				{'*':[{},'v',1]}],
-		'w' : [['wapiti','kiwi','sandwich'],
-				{'wapiti':[{'+':/apiti/i},'w',1],
-				'kiwi':[{'-':/ki/i,'+':/i/i},'w',1],
-				'sandwich':[{'+':/ich/i},'w',1],
-				'*':[{},'v',1]}],
+		'w' : [['wurt','wisig','wag','wa', 'wi'],
+				{'wurt':[{'+':/urt/i},'v',1], // saucisse
+                'wisig':[{'+':/isig/i},'v',1], // wisigoth
+                'wag':[{'+':/ag/i},'v',1], // wagons et wagnérien
+                'wa':[{'+':/a/i},'wa',2], // watt, wapiti, etc.
+                'wi':[{'+':/i/i},'w_i',2], // kiwi
+				'*':[{},'w',1]}],
 		'x' : [['six_dix','gz_1','gz_2','gz_3','gz_4','gz_5','_aeox','fix','_ix'],
 				{'six_dix':[{'-':/(s|d)i/i},'s_x',1],
 				'gz_1':[{'-':/^/i,'+':/[aeiouéèàüëöêîôûù]/i},'gz',1], // mots qui commencent par un x suivi d'une voyelle
@@ -997,6 +1014,41 @@ LireCouleurEngine.prototype.post_traitement_o_ouvert_ferme = function(pp) {
 }
 
 /*
+ * Post traitement la constitution d'allophones des phonèmes avec yod
+ * référence : voir http://andre.thibault.pagesperso-orange.fr/PhonologieSemaine10.pdf (cours du 3 février 2016)
+ */
+LireCouleurEngine.prototype.post_traitement_yod = function(pp) {
+	if ((pp.constructor !== Array) || (pp.length == 1)) {
+		return pp;
+	}
+
+	if (pp.filter(function(phon, index, array) { return (phon.phoneme == 'j'); }) > 0) {
+		// pas de 'yod' dans le mot
+		return pp;
+	}
+    
+    var phon_suivant = ['a', 'a~', 'e', 'e^', 'e_comp', 'e^_comp', 'o', 'o_comp', 'o~', 'e~', 'x', 'x^', 'u'];
+
+	pp.forEach(function(element, i_ph, array) {
+		if (element.phoneme == 'j') {
+			if (i_ph == pp.length-1) {
+				// fin de mot (bizarre d'ailleurs !)
+				return pp;
+			}
+
+            // phonème suivant
+			if (phon_suivant.indexOf(pp[i_ph+1].phoneme) > -1) {
+                pp[i_ph].phoneme = 'j_'+pp[i_ph+1].phoneme;
+                pp[i_ph].lettres += pp[i_ph+1].lettres;
+                pp.splice(i_ph+1, 1);
+			}
+		}
+	});
+
+    return pp;
+}
+
+/*
  * Post traitement pour déterminer si le son [x] est ouvert "e" ou fermé "eu"
  */
 LireCouleurEngine.prototype.post_traitement_e_ouvert_ferme = function(pp) {
@@ -1120,12 +1172,21 @@ LireCouleurEngine.prototype.extrairePhonemes = function(mot, para, p_para) {
 	// console.log('--------------------');
 	// console.log(codage);
 	// console.log('--------------------');
+    
+    // post traitement pour associer yod + [an, in, en, on, a, é, etc.]
+    codage = this.post_traitement_yod(codage);
 
 	// post traitement pour différencier les o ouverts et les o fermés
 	codage = this.post_traitement_o_ouvert_ferme(codage);
 
 	// post traitement pour différencier les eu ouverts et les eu fermés
 	codage = this.post_traitement_e_ouvert_ferme(codage);
+
+	console.log('--------------------');
+    codage.forEach(function(element, i_ph, array) {
+		console.log(element.phoneme, element.lettres);
+	});
+	console.log('--------------------');
 
 	return codage;
 }
@@ -1181,10 +1242,13 @@ LireCouleurEngine.prototype.extraireSyllabes = function(phonemes, std_lc, oral_e
 			if (phon.estUneVoyelle()) {
 				sylph.push(['v',[i]]);
 			}
+			else if (phon.estSemiConsonne()) {
+				sylph.push(['v',[i]]);
+			}
 			else if (phon.estUneConsonne()) {
 				sylph.push(['c',[i]]);
 			}
-			else if (phon.estSemiConsonne()) {
+			else if (phon.estSemiVoyelle()) {
 				sylph.push(['s',[i]]);
 			}
 			else {
