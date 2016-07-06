@@ -1,5 +1,7 @@
 Corrections :
 * modification de la règle 'ien' de la lettre "e" pour décoder correctement les mots terminés par "cien" comme batracien, mécanicien, etc.
+* la plupart des mots terminés par 'am' étaient décodés comme 'a~'... c'est corrigé
+* traitement des mots dérivés de 'damné' : le m ne se prononce pas
 
 ------------------------- 3.5.1------------------------- 
 

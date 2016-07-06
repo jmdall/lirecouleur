@@ -827,8 +827,8 @@ def regle_tien(mot, pos_mot):
 autom = {
     'a' : [['u','il','in','nc_ai_fin','ai_fin','i','n','m','nm','y_except','y'],
             {'n':[{'+':u(r"n[bcçdfgjklmpqrstvwxz]")},'a~',2],
-            'm':[{'+':u(r"m[bcçdfgjklpqrstvwxz]")},'a~',2], ## toute consonne sauf le n
-            'nm':[{'+':r"[nm]$"},'a~',2],
+            'm':[{'+':u(r"m[mbp]")},'a~',2], ## règle du m devant m, b, p
+            'nm':[{'+':r"n(s?)$"},'a~',2],
             'y_except':[{'-':r"(^b|cob|cip)",'+':r"y"},'a',1], ## exception : baye, cobaye
             'y':[{'+':r"y"},'e^_comp',1],
             'u':[{'+':r"u"},'o_comp',2],
@@ -882,7 +882,7 @@ autom = {
             'dmuet':[{'+':r"(s?)$"},'#',1], ## un d suivi éventuellement d'un s ex. : retards
             'apostrophe':[{'+':r"(\'|\’)"},'d',2], ## apostrophe
             '*':[{},'d',1]}],
-    'e' : [['conj_v_ier','uient','ien','een','except_en_1','except_en_2','_ent','clef','hier','adv_emment_fin',
+    'e' : [['conj_v_ier','uient','ien','ien_2','een','except_en_1','except_en_2','_ent','clef','hier','adv_emment_fin',
             'ment','imparfait','verbe_3_pluriel','au',
             'avoir','monsieur','jeudi','jeu_','eur','eu','eu_accent_circ','in','eil','y','iy','ennemi','enn_debut_mot','dessus_dessous',
             'et','cet','t_final','eclm_final','est','drz_final','n','adv_emment_a','femme','lemme','em_gene','nm','tclesmesdes',
@@ -906,6 +906,7 @@ autom = {
             'except_en_2':[{'-':u(r"[ao]ï"),'+':r"n(s?)$"},'e~',2], ## païen, hawaïen, tolstoïen
             'een':[{'-':u(r"é"),'+':r"n(s?)$"},'e~',2], ## les mots qui se terminent par 'éen'
             'ien':[{'-':r"[bcdlmrstvh]i",'+':u(r"n([bcçdfghjklpqrstvwxz]|$)")},'e~',2], ## certains mots avec 'ien' => son [e~]
+            'ien_2':[{'-':r"ï",'+':u(r"n([bcçdfghjklpqrstvwxz]|$)")},'e~',2], ## certains mots avec 'ien' => son [e~]
             'nm':[{'+':r"[nm]$"},'a~',2],
             'drz_final':[{'+':r"[drz](s?)$"},'e_comp',2], ## e suivi d'un d,r ou z en fin de mot done le son [e]
             'que_isole':[{'-':r"^qu",'+':r"$"},'q',1], ## que isolé
@@ -1017,8 +1018,9 @@ autom = {
             'eil':[{'-':r"e(u?)i"},'j',1], ## les mots terminés en 'eil' ou 'ueil' => son [j]
             'apostrophe':[{'+':r"(\'|\’)"},'l',2], ## apostrophe
             '*':[{},'l',1]}],
-    'm' : [['m','tomn','misole','apostrophe'],
+    'm' : [['m','damn','tomn','misole','apostrophe'],
             {'m':[{'+':r"m"},'m',2],
+            'damn':[{'-':r"da",'+':r"n"},'#',1], ## regle spécifique pour 'damné' et ses dérivés
             'tomn':[{'-':r"to",'+':r"n"},'#',1], ## regle spécifique pour 'automne' et ses dérivés
             '*':[{},'m',1],
             'misole':[{'+':r"$",'-':r"^"},'m',1], ## exemple : m'a
@@ -1419,7 +1421,7 @@ def post_traitement_yod(pp):
             return pp
         
         # phonème suivant
-        phon_suivant = ['a', 'a~', 'e', 'e^', 'e_comp', 'e^_comp', 'o', 'o~', 'e~', 'x', 'x^', 'u']
+        phon_suivant = ['a', 'a~', 'e', 'e^', 'e_comp', 'e^_comp', 'o', 'o_comp', 'o~', 'e~', 'x', 'x^', 'u']
         if phonemes[i_ph+1] in phon_suivant and len(pp[i_ph][1]) == 1:
             pp[i_ph] = ('j_'+phonemes[i_ph+1], pp[i_ph][1]+pp[i_ph+1][1])
             if len(pp[i_ph+2:]) > 0:
