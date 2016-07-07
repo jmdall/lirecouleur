@@ -40,7 +40,7 @@ function LireCouleurFormat() {
 		"phon_un": "color: #a9d82e; font-family: serif; font-style: oblique; font-weight: bold;",
 		"phon_on": "color: #cf6633; font-family: serif; font-style: oblique; font-weight: bold;",
 		"phon_eu": "color: #198a8a;",
-		"phon_y": "color: #892ca0; font-family: serif; font-style: oblique; font-weight: bold;",
+		"phon_y": "color: #000; font-family: serif; font-style: italic; border-style: none none solid none;",
 		"phon_z": "color: #31859b; font-weight: bold; font-style: oblique; ",
 		"phon_g": "color: #632423; ",
 		"phon_ge": "color: #205867; ",
@@ -62,6 +62,13 @@ function LireCouleurFormat() {
 		"phon_ks": "color: #548dd4; font-weight: bold; font-style: oblique; font-family: serif; ",
 		"phon_gz": "color: #0f243e; "
 	};
+    
+    this.style_semi = {
+		"w" : "	font-family: serif; font-style: italic; border-style: none none dotted none;",
+		"y" : "	font-family: serif; font-style: italic; border-style: none none double none;",
+		"j" : "	font-family: serif; font-style: italic; border-style: none none solid none;",
+    };
+    
 	this._isyl = 0;
 	
 	this.phonemes = {};
@@ -157,11 +164,32 @@ LireCouleurFormat.prototype.formatPhonemes = function(document, docfrag, l_phone
 	var iphon;
 	l_phonemes.forEach(function(element, index, array) {
 		var e = document.createElement("span");
-		iphon = moi.correspondances[element.phoneme];
-		if (element.estPhoneme() && moi.phonemes[iphon]) {
-			e.style = moi.couleurs[iphon];
-		}
-		e.appendChild(document.createTextNode(element.lettres));
+        
+        if (element.estSemiConsonne()) {
+            var il = 1;
+            if (element.phoneme.startsWith('w_') && element.lettres.startsWith('ou')) {
+                // micmac pour savoir s'il faut souligner une ou 2 lettres
+                il = 2;
+            }
+            iphon = moi.correspondances[element.phoneme.substring(2)];
+            if (element.estPhoneme() && moi.phonemes[iphon]) {
+                e.style = moi.couleurs[iphon];
+                
+                var ee = document.createElement("span");
+                ee.style = moi.style_semi[element.phoneme.substring(0, 1)];
+                ee.appendChild(document.createTextNode(element.lettres.substring(0, il)));
+                e.appendChild(ee);
+                
+                e.appendChild(document.createTextNode(element.lettres.substring(il)));
+            }
+        }
+        else {
+            iphon = moi.correspondances[element.phoneme];
+            if (element.estPhoneme() && moi.phonemes[iphon]) {
+                e.style = moi.couleurs[iphon];
+            }
+            e.appendChild(document.createTextNode(element.lettres));
+        }
 		docfrag.appendChild(e);
 	});
 	return docfrag;
