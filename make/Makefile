@@ -28,4 +28,4 @@ tests : ../src/opendocument-plugin/pythonpath/lirecouleur.py ../src/opendocument
 	python ../tests/tests_lirecouleur.py
 
 web :
-	cp ../src/web/js/lirecouleur.js ../src/firefox-plugin/data/
+	cp ../src/ckeditor-plugin/lirecouleur.js ../src/firefox-plugin/data/
