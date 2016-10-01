@@ -1040,7 +1040,7 @@ autom = {
             }],
     'o' : [['in','oignon','i','ouat','oui','oue','tomn','monsieur','n','m','nm','y1','y2','u','o','oe_0',
             'oe_1','oe_2', 'oe_3','voeux','oeufs','noeud','oeu_defaut','oe_defaut'],
-            {'in':[{'+':r"i[nm]"},'w_e~',3],
+            {'in':[{'+':r"i[nm]([bcçdfghjklnmpqrstvwxz]|$)"},'w_e~',3],
             'oignon':[{'-':r"^",'+':r"ignon"},'o',2],
             'i':[{'+':u(r"(i|î)")},'wa',2],
             'oue':[{'-':r"^",'+':u(r"ue")},'w_e^_comp',3], # ouest, oued
