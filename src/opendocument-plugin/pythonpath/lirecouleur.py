@@ -192,6 +192,33 @@ def handleMaskSyllo():
     return (choix_syllo%10, choix_syllo/10)
 
 ######################################################################################
+# Lecture de l'info de marquage d'un point sous les lettres muettes
+######################################################################################
+def handleMaskDynSyllDys():
+    """Lecture de l'info sur le choix d'affichage des syllabes dynamiquement ou non dans le fichier .lirecouleur"""
+
+    # par défaut : faux
+    choix_dynsylldys = False
+
+    # read the file content
+    adata = readAppData()
+
+    # lecture dans la structure du fichier
+    try:
+        choix_dynsylldys = adata['__dynsylldys__']
+    except:
+        pass
+
+    return choix_dynsylldys
+
+######################################################################################
+# Sauvegarde de l'info de marquage d'un point sous les lettres muettes
+######################################################################################
+def saveMaskDynSyllDys(selectdsd):
+    """Sauvegarde de l'info sur l'affichage dynamique de syllanes dans le fichier .lirecouleur"""
+    saveAppData('__dynsylldys__', selectdsd)
+
+######################################################################################
 # Lecture de l'info de configuration du pays
 ######################################################################################
 def handleMaskCountry():
@@ -483,7 +510,7 @@ verbes_ier = ['affilier','allier','allier','amnistier','amplifier','anesthesier'
 'confier','congedier','contrarier','copier','crier','crucifier','dactylographier',
 'differencier','disgracier','disqualifier','dissocier','distancier','diversifier','domicilier',
 'decrier','dedier','defier','deifier','delier','demarier','demultiplier','demystifier','denazifier',
-'denier','deplier','deprecier','dequalifier','devier','envier','estropier','excommunier',
+'denier','deplier','deprecier','dequalifier',u('dévier'),'envier','estropier','excommunier',
 'exemplifier','exfolier','expatrier','expier','exproprier','expedier','extasier','falsifier',
 'fier','fluidifier','fortifier','frigorifier','fructifier','gazeifier','glorifier','gracier',
 'gratifier','horrifier','humidifier','humilier','identifier','incendier','ingenier','initier',
@@ -573,7 +600,11 @@ def regle_ient(mot, pos_mot):
         return False
 
     # il faut savoir si le mot est un verbe dont l'infinitif se termine par 'ier' ou non
-    pseudo_infinitif = texte_sans_accent(mot[:-2]+'r')
+    pseudo_infinitif = mot[:-2]+'r'
+    if pseudo_infinitif in verbes_ier:
+        logging.info("func regle_ient : "+mot+" ("+pseudo_infinitif+")")
+        return True
+    pseudo_infinitif = texte_sans_accent(pseudo_infinitif)
     if len(pseudo_infinitif) > 1 and pseudo_infinitif[1] == '@':
         # mot précédé d'un déterminant élidé - codage de l'apostrophe : voir pretraitement_texte
         pseudo_infinitif = pseudo_infinitif[2:]

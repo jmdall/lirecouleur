@@ -743,13 +743,14 @@ def importStylesLireCouleur(xModel):
 # Gestionnaire d'événement de la boite de dialogue
 ######################################################################################
 class MyActionListener(unohelper.Base, XActionListener):
-    def __init__(self, controlContainer, checkListPhonemes, fieldCoul, fieldEsp, checkPoint,
+    def __init__(self, controlContainer, checkListPhonemes, fieldCoul, fieldEsp, checkPoint, checkDynsylldys,
                     selectTyp1Syll, selectTyp2Syll, selectLoc, fieldTemp):
         self.controlContainer = controlContainer
         self.checkListPhonemes = checkListPhonemes
         self.fieldCoul = fieldCoul
         self.fieldEsp = fieldEsp
         self.checkPoint = checkPoint
+        self.checkDynsylldys = checkDynsylldys
         self.selectTyp1Syll = selectTyp1Syll
         self.selectTyp2Syll = selectTyp2Syll
         self.selectLocale = selectLoc
@@ -816,6 +817,7 @@ class MyActionListener(unohelper.Base, XActionListener):
         saveMaskAlternate(int(nbcouleurs))
         saveMaskSubspaces(int(nbespaces))
         saveMaskPoint(self.checkPoint.getState())
+        saveMaskDynSyllDys(self.checkDynsylldys.getState())
 
         saveMaskSyllo(self.selectTyp1Syll.getSelectedItemPos(), self.selectTyp2Syll.getSelectedItemPos())
         saveMaskTemplate(tempFilename)
@@ -950,6 +952,9 @@ def __creerSelectPhonemesDialog__(xDocument, xContext):
     # lecture pour savoir s'il faut mettre un point sous les lettres muettes dans le fichier .lirecouleur
     selectpoint = handleMaskPoint()
 
+    # lecture de l'info sur le choix d'affichage des syllabes dynamiquement ou non dans le fichier .lirecouleur
+    selectdynsyldys = handleMaskDynSyllDys()
+
     # lecture pour savoir comment il faut afficher les syllabes dans le fichier .lirecouleur
     selectsyllo = handleMaskSyllo()
 
@@ -1063,7 +1068,7 @@ def __creerSelectPhonemesDialog__(xDocument, xContext):
 
     labelListLocale = dialogModel.createInstance("com.sun.star.awt.UnoControlFixedTextModel")
     labelListLocale.PositionX = 10
-    labelListLocale.PositionY = checkKS.PositionY+checkKS.Height+2
+    labelListLocale.PositionY = checkKS.PositionY+checkKS.Height+6
     labelListLocale.Width  = 50
     labelListLocale.Height = checkKS.Height
     labelListLocale.Name = "labelListLocale"
@@ -1072,9 +1077,9 @@ def __creerSelectPhonemesDialog__(xDocument, xContext):
 
     listLocale = dialogModel.createInstance("com.sun.star.awt.UnoControlListBoxModel")
     listLocale.PositionX = labelListLocale.PositionX+labelListLocale.Width
-    listLocale.PositionY = labelListLocale.PositionY
+    listLocale.PositionY = labelListLocale.PositionY-2
     listLocale.Width  = 50
-    listLocale.Height  = checkKS.Height
+    listLocale.Height  = 12
     listLocale.Name = "listLocale"
     listLocale.TabIndex = 1
     listLocale.Dropdown = True
@@ -1130,7 +1135,7 @@ def __creerSelectPhonemesDialog__(xDocument, xContext):
     sep1.PositionX = 2
     sep1.PositionY = listLocale.PositionY+listLocale.Height+2
     sep1.Width  = dialogModel.Width - 4
-    sep1.Height  = 5
+    sep1.Height  = 2
     sep1.Name = "sep1"
     sep1.TabIndex = 1
 
@@ -1162,17 +1167,21 @@ def __creerSelectPhonemesDialog__(xDocument, xContext):
     sep2.Name = "sep2"
     sep2.TabIndex = 1
 
-    checkPoint = createCheckBox(dialogModel, 10, sep2.PositionY+sep2.Height, "checkPoint", 0,
-                    _(u("Placer des symboles sous certains sons")), selectpoint, dialogModel.Width-10)
+    checkPoint = createCheckBox(dialogModel, 8, sep2.PositionY+sep2.Height-2, "checkPoint", 0,
+                    _(u("Symboles sous phonèmes")), selectpoint, dialogModel.Width/2-4)
+
+    checkDynsylldys = createCheckBox(dialogModel, checkPoint.PositionX+checkPoint.Width+10,
+            checkPoint.PositionY, "checkDynsylldys", 0, _(u("Surligner syllabes")), selectdynsyldys,
+            dialogModel.Width-checkPoint.PositionX-checkPoint.Width-10)
 
     labelRadio = dialogModel.createInstance("com.sun.star.awt.UnoControlFixedTextModel")
     labelRadio.PositionX = 10
-    labelRadio.PositionY = checkPoint.PositionY+checkPoint.Height+2
-    labelRadio.Width  = dialogModel.Width-100-12
+    labelRadio.PositionY = checkPoint.PositionY+checkPoint.Height+7
+    labelRadio.Width  = dialogModel.Width/2-30
     labelRadio.Height = 10
     labelRadio.Name = "labelRadio"
     labelRadio.TabIndex = 1
-    labelRadio.Label = _(u("Souligner les syllabes"))
+    labelRadio.Label = _(u("Type des syllabes"))
 
     listTyp1Syll = dialogModel.createInstance("com.sun.star.awt.UnoControlListBoxModel")
     listTyp1Syll.PositionX = labelRadio.PositionX+labelRadio.Width
@@ -1191,7 +1200,7 @@ def __creerSelectPhonemesDialog__(xDocument, xContext):
 
     listTyp2Syll = dialogModel.createInstance("com.sun.star.awt.UnoControlListBoxModel")
     listTyp2Syll.PositionX = listTyp1Syll.PositionX+listTyp1Syll.Width
-    listTyp2Syll.PositionY = listTyp1Syll.PositionY
+    listTyp2Syll.PositionY = labelRadio.PositionY-2
     listTyp2Syll.Width  = 50
     listTyp2Syll.Height  = listTyp1Syll.Height
     listTyp2Syll.Name = "listTyp2Syll"
@@ -1206,7 +1215,7 @@ def __creerSelectPhonemesDialog__(xDocument, xContext):
 
     sep3 = dialogModel.createInstance("com.sun.star.awt.UnoControlFixedLineModel")
     sep3.PositionX = sep1.PositionX
-    sep3.PositionY = labelRadio.PositionY+labelRadio.Height+2
+    sep3.PositionY = listTyp2Syll.PositionY+listTyp2Syll.Height+2
     sep3.Width  = sep1.Width
     sep3.Height  = sep1.Height
     sep3.Name = "sep3"
@@ -1296,6 +1305,7 @@ def __creerSelectPhonemesDialog__(xDocument, xContext):
     dialogModel.insertByName("checkGZ", checkGZ)
 
     dialogModel.insertByName("checkPoint", checkPoint)
+    dialogModel.insertByName("checkDynsylldys", checkDynsylldys)
     dialogModel.insertByName(labelListLocale.Name, labelListLocale)
     dialogModel.insertByName(listLocale.Name, listLocale)
 
@@ -1318,6 +1328,7 @@ def __creerSelectPhonemesDialog__(xDocument, xContext):
                                 controlContainer.getControl("fieldCoul"),
                                 controlContainer.getControl("fieldEsp"),
                                 controlContainer.getControl("checkPoint"),
+                                controlContainer.getControl("checkDynsylldys"),
                                 controlContainer.getControl(listTyp1Syll.Name),
                                 controlContainer.getControl(listTyp2Syll.Name),
                                 controlContainer.getControl(listLocale.Name),
@@ -3485,6 +3496,10 @@ class LireCouleurHandler(unohelper.Base, XKeyHandler):
 ###################################################################################
 def __lirecouleur_dynsylldys__(xDocument):
     """Mise en évidence des syllabes soulignées dynamiquement"""
+    
+    choix_dynsylldys = handleMaskDynSyllDys()
+    if not choix_dynsylldys:
+        return
 
     oConfigProvider = createUnoService('com.sun.star.configuration.ConfigurationProvider')
     ppp = createUnoStruct("com.sun.star.beans.PropertyValue")
@@ -3511,6 +3526,10 @@ def __lirecouleur_dynsylldys__(xDocument):
 
 def __arret_dynsylldys__(xDocument):
     """Arrêt de la mise en évidence des syllabes soulignées dynamiquement"""
+    choix_dynsylldys = handleMaskDynSyllDys()
+    if not choix_dynsylldys:
+        return
+
     try:
         global __memoKeys__
         key = xDocument.RuntimeUID

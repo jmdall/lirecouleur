@@ -1,3 +1,6 @@
+Correction :
+* prononciation de "sourcil" ou "persil" : le "l" final ne se prononce pas
+
 ------------------------- 3.5.2------------------------- 
 
 Corrections :
