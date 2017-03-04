@@ -1035,7 +1035,7 @@ LireCouleurEngine.prototype.post_traitement_yod = function(pp) {
 
 	pp.forEach(function(element, i_ph, array) {
 		if (element.phoneme == 'j') {
-			if (i_ph == pp.length-1) {
+			if (i_ph > pp.length-2) {
 				// fin de mot (bizarre d'ailleurs !)
 				return pp;
 			}

@@ -1447,7 +1447,7 @@ def post_traitement_yod(pp):
     i_j = all_indices('j', phonemes[:nb_ph+1])
 
     for i_ph in i_j:
-        if i_ph == nb_ph:
+        if i_ph >= nb_ph:
             # fin de mot (bizarre d'ailleurs !)
             return pp
         

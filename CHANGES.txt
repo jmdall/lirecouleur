@@ -1,5 +1,6 @@
 Correction :
 * prononciation de "sourcil" ou "persil" : le "l" final ne se prononce pas
+* correction d'un bug ligne 1450 pour éviter un plantage sur le décodage du mot "vieil"
 
 ------------------------- 3.5.2------------------------- 
 
