@@ -759,7 +759,7 @@ LireCouleurEngine.prototype.regle_er = function(mot, pos_mot) {
 		// mot précédé d'un déterminant élidé - codage de l'apostrophe : voir pretraitement_texte
 		m_sing = m_sing.slice(2);
 	}
-
+    
 	// tester la terminaison
 	if ((mot.slice(-4).match(/er/) === null) || (pos_mot < mot.length-2)) {
 		// le mot ne se termine pas par 'er'
@@ -770,7 +770,9 @@ LireCouleurEngine.prototype.regle_er = function(mot, pos_mot) {
 	// il faut savoir si le mot figure dans la liste des exceptions
 	var exceptions_final_er = ['amer', 'cher', 'hier', 'mer', 'coroner', 'charter', 'cracker',
 	'chester', 'doppler', 'cascher', 'bulldozer', 'cancer', 'carter', 'geyser', 'cocker',
-	'alter', 'aster', 'fer', 'cuiller', 'container', 'cutter', 'révolver', 'super', 'master'];
+	'alter', 'aster', 'fer', 'ver', 'perver', 'enfer', 'traver', 'univer', 'cuiller', 'container',
+    'cutter', 'révolver', 'super', 'master'];
+    
 	return (exceptions_final_er.indexOf(m_sing) > -1);
 }
 
@@ -1035,7 +1037,7 @@ LireCouleurEngine.prototype.post_traitement_yod = function(pp) {
 
 	pp.forEach(function(element, i_ph, array) {
 		if (element.phoneme == 'j') {
-			if (i_ph > pp.length-2) {
+			if (i_ph == pp.length-1) {
 				// fin de mot (bizarre d'ailleurs !)
 				return pp;
 			}
