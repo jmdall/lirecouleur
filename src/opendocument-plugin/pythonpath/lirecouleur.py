@@ -706,8 +706,8 @@ def regle_er(mot, pos_mot):
 
     # il faut savoir si le mot figure dans la liste des exceptions
     exceptions_final_er = ['amer', 'cher', 'hier', 'mer', 'coroner', 'charter', 'cracker',
-    'chester', 'doppler', 'cascher', 'bulldozer', 'cancer', 'carter', 'geyser', 'cocker',
-    'alter', 'aster', 'fer', 'ver', 'perver', 'enfer', 'traver', 'univer', 'cuiller', 'container', 'cutter',
+    'chester', 'doppler', 'cascher', 'bulldozer', 'cancer', 'carter', 'geyser', 'cocker', 'pullover',
+    'alter', 'aster', 'fer', 'ver', 'diver', 'perver', 'enfer', 'traver', 'univer', 'cuiller', 'container', 'cutter',
     u('révolver'), 'super', 'master']
     if m_sing in exceptions_final_er:
         logging.info(u("func regle_er : ")+mot+u(" -- le mot n'est pas une exception comme 'amer' ou 'cher'"))

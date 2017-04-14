@@ -69,7 +69,10 @@ function LireCouleurFormat() {
 		"j" : "	font-family: serif; font-style: italic; text-decoration: underline;",
     };
     
+    // compteur de syllabes (alternance de couleurs)
 	this._isyl = 0;
+    // traitement appliqué (0=noir ; 1=phonèmes ; 2=syllabes ; 3=lettres muettes)
+	this._traitement = 0;
 	
 	this.phonemes = {};
 	for(var key in this.correspondances) {
@@ -102,6 +105,16 @@ LireCouleurFormat.prototype.fromString = function(txt) {
 		moi.phonemes[element.phon] = (String(element.select) == 'true');
 		moi.couleurs[element.phon] = element.style;
 	});
+}
+
+/*
+ * Ne garder que le phonème muet dans la liste des phonèmes à mettre en évidence
+ */
+LireCouleurFormat.prototype.setPhonMuet = function() {
+	for(var key in this.phonemes) {
+        this.phonemes[key] = false;
+	}
+    this.phonemes['phon_muet'] = true;
 }
 
 /*
@@ -157,22 +170,24 @@ LireCouleurFormat.prototype.formatPhonemes = function(document, docfrag, l_phone
 		var e = document.createElement("span");
         
         if (element.estSemiConsonne()) {
-            var il = 1;
-            if (element.phoneme.startsWith('w_') && element.lettres.startsWith('ou')) {
-                // micmac pour savoir s'il faut souligner une ou 2 lettres
-                il = 2;
-            }
+            var il = 0;
             iphon = moi.correspondances[element.phoneme.substring(2)];
             if (element.estPhoneme() && moi.phonemes[iphon]) {
                 e.style = moi.couleurs[iphon];
                 
+                il = 1;
+                if (element.phoneme.startsWith('w_') && element.lettres.startsWith('ou')) {
+                    // micmac pour savoir s'il faut souligner une ou 2 lettres
+                    il = 2;
+                }
+
                 var ee = document.createElement("span");
                 ee.style = moi.style_semi[element.phoneme.substring(0, 1)];
                 ee.appendChild(document.createTextNode(element.lettres.substring(0, il)));
                 e.appendChild(ee);
-                
-                e.appendChild(document.createTextNode(element.lettres.substring(il)));
             }
+                
+            e.appendChild(document.createTextNode(element.lettres.substring(il)));
         }
         else {
             iphon = moi.correspondances[element.phoneme];
@@ -199,6 +214,25 @@ LireCouleurFormat.prototype.formatSyllabes = function(document, docfrag, l_sylla
 		moi._isyl = ((moi._isyl+1) % 3);
 	});
 	return docfrag;
+}
+
+/*
+ * Sélection du traitement à appliquer
+ */
+LireCouleurFormat.prototype.selectTraitement = function(tt) {
+	var moi = this;
+    moi._isyl = 0;
+    moi._traitement = tt;
+
+    // relecture des cookies
+    moi.getCookies();
+}
+
+/*
+ * Relecture du dernier traitement appliqué
+ */
+LireCouleurFormat.prototype.getTraitement = function() {
+    return this._traitement;
 }
 
 /*

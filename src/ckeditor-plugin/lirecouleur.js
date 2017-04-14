@@ -769,8 +769,8 @@ LireCouleurEngine.prototype.regle_er = function(mot, pos_mot) {
 
 	// il faut savoir si le mot figure dans la liste des exceptions
 	var exceptions_final_er = ['amer', 'cher', 'hier', 'mer', 'coroner', 'charter', 'cracker',
-	'chester', 'doppler', 'cascher', 'bulldozer', 'cancer', 'carter', 'geyser', 'cocker',
-	'alter', 'aster', 'fer', 'ver', 'perver', 'enfer', 'traver', 'univer', 'cuiller', 'container',
+	'chester', 'doppler', 'cascher', 'bulldozer', 'cancer', 'carter', 'geyser', 'cocker', 'pullover',
+	'alter', 'aster', 'fer', 'ver', 'diver', 'perver', 'enfer', 'traver', 'univer', 'cuiller', 'container',
     'cutter', 'révolver', 'super', 'master'];
     
 	return (exceptions_final_er.indexOf(m_sing) > -1);
