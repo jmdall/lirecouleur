@@ -1,6 +1,34 @@
 /*
  * 
  */
+function LireCouleurStyle(chaine) {
+	var moi = this;
+	this.dict = {};
+    var chainespl = chaine.split(';');
+    for(var un_item in chainespl) {
+		if (un_item.length > 0) {
+			var attval = un_item.split(':');
+			if (attval.length == 2) {
+				moi.dict[attval[0].trim()] = attval[1].trim();
+			}
+		}
+	}
+}
+
+/*
+ * Transforme un style en chaîne de caractères
+ */
+LireCouleurStyle.prototype.toString = function() {
+	var stl = "";
+	for(var key in this.dict) {
+		stl += key + ': ' + this.dict[key] + '; ';
+	}
+	return stl;
+}
+
+/*
+ * 
+ */
 function LireCouleurFormat() {
 	this.correspondances = {'verb_3p':'phon_muet', '#':'phon_muet', 'q_caduc':'phon_e',
 		'a':'phon_a', 'q':'phon_e', 'i':'phon_i', 'o':'phon_o', 'o_comp':'phon_o',
@@ -163,6 +191,21 @@ LireCouleurFormat.prototype.getCookies = function() {
 /*
  * Décodage d'un mot sous la forme d'une suite de phonèmes
  */
+LireCouleurFormat.prototype.setStyle = function(e, style) {
+    var stl = style.split(';');
+    for(var i in stl) {
+		if (stl[i].length > 0) {
+			var attval = stl[i].split(':');
+			if (attval.length == 2) {
+				e.style.setProperty(attval[0].trim(), attval[1].trim());
+			}
+		}
+	}
+}
+
+/*
+ * Décodage d'un mot sous la forme d'une suite de phonèmes
+ */
 LireCouleurFormat.prototype.formatPhonemes = function(document, docfrag, l_phonemes) {
 	var moi = this;
 	var iphon;
@@ -173,7 +216,7 @@ LireCouleurFormat.prototype.formatPhonemes = function(document, docfrag, l_phone
             var il = 0;
             iphon = moi.correspondances[element.phoneme.substring(2)];
             if (element.estPhoneme() && moi.phonemes[iphon]) {
-                e.style = moi.couleurs[iphon];
+                moi.setStyle(e, moi.couleurs[iphon]);
                 
                 il = 1;
                 if (element.phoneme.startsWith('w_') && element.lettres.startsWith('ou')) {
@@ -192,7 +235,7 @@ LireCouleurFormat.prototype.formatPhonemes = function(document, docfrag, l_phone
         else {
             iphon = moi.correspondances[element.phoneme];
             if (element.estPhoneme() && moi.phonemes[iphon]) {
-                e.style = moi.couleurs[iphon];
+                moi.setStyle(e, moi.couleurs[iphon]);
             }
             e.appendChild(document.createTextNode(element.lettres));
         }
@@ -204,14 +247,34 @@ LireCouleurFormat.prototype.formatPhonemes = function(document, docfrag, l_phone
 /*
  * Décodage d'un mot sous la forme d'une suite de phonèmes
  */
-LireCouleurFormat.prototype.formatSyllabes = function(document, docfrag, l_syllabes) {
+LireCouleurFormat.prototype.formatSyllabes = function(document, docfrag, l_syllabes, mode) {
 	var moi = this;
-	var muet = this.couleurs['phon_muet'];
+	var muet = moi.couleurs['phon_muet'];
 	l_syllabes.forEach(function(element, index, array) {
 		var e = document.createElement("span");
-		e.style = moi.couleurs['syl_'+(moi._isyl+1).toString()];
-		docfrag.appendChild(element.texte(e, muet));
+        if ( mode == "sd" ) {
+            //e.style = moi.couleurs['syl_'+(moi._isyl+1).toString()];
+            moi.setStyle(e, moi.couleurs['syl_'+(moi._isyl+1).toString()]);
+        }
+        e.style.verticalAlign = "top";
+
+        var esyl = element.texte(e, muet);
+		docfrag.appendChild(esyl);
 		moi._isyl = ((moi._isyl+1) % 3);
+        
+        if ( mode == "s" ) {
+            // ajout d'un arc sous la syllabe
+            var width = esyl.getBoundingClientRect().width;
+
+            var arc = document.createElement("img");
+            arc.width = width;
+            arc.height = 12;
+            arc.src = "img/syllb.png";
+            e.style.width = width.toString()+"px";
+            e.style.display = "inline-block";
+            e.style.lineHeight = "1";
+            e.appendChild(arc);
+        }
 	});
 	return docfrag;
 }
@@ -235,29 +298,3 @@ LireCouleurFormat.prototype.getTraitement = function() {
     return this._traitement;
 }
 
-/*
- * 
- */
-var LireCouleurStyle = function(chaine) {
-	var moi = this;
-	this.dict = {};
-	chaine.split(';').forEach(function(un_item, index, array) {
-		if (un_item.length > 0) {
-			var attval = un_item.split(':');
-			if (attval.length == 2) {
-				moi.dict[attval[0].trim()] = attval[1].trim();
-			}
-		}
-	});
-}
-
-/*
- * Transforme un style en chaîne de caractères
- */
-LireCouleurStyle.prototype.toString = function() {
-	var stl = "";
-	for(var key in this.dict) {
-		stl += key + ': ' + this.dict[key] + '; ';
-	}
-	return stl;
-}

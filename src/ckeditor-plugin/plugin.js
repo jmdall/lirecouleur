@@ -12,15 +12,19 @@ function _formatElement( elt, mode ) {
 			if (pmots !== null) {
 				var para = document.createElement("span");
                 para.className = "lirecouleur";
+
+				// remplace le texte d'origine par le texte traité
+				elt.replaceChild(para, elt.childNodes[i]);
+
 				pmots.forEach(function( element, index, array ) {
                     var i = paragraphe.indexOf( element, pos );
                     para.appendChild( document.createTextNode( paragraphe.substring(pos, i) ) );
                     
                     var phon = LireCouleur.extrairePhonemes( element );
                     
-                    if ( mode == 's' ) {
+                    if ( mode.startsWith( 's' ) ) {
                         var sylls = LireCouleur.extraireSyllabes( phon );
-                        LireCouleurFormateur.formatSyllabes( document, para, sylls );
+                        LireCouleurFormateur.formatSyllabes( document, para, sylls, mode );
                     }
                     else {
                         LireCouleurFormateur.formatPhonemes( document, para, phon );
@@ -29,9 +33,6 @@ function _formatElement( elt, mode ) {
                     pos += element.length+( i-pos );
 				});
 				para.appendChild( document.createTextNode( paragraphe.substring(pos) ) );
-				
-				// remplace le texte d'origine par le texte traité
-				elt.replaceChild(para, elt.childNodes[i]);
 			}
 		}
 		else {
@@ -110,7 +111,7 @@ function _unformatElement( elt ) {
 
 */
 CKEDITOR.plugins.add( 'lirecouleur', {
-    icons: 'config,black,phon,syll_dys,lmuettes,lines',
+    icons: 'config,black,phon,syll_dys,syll,lmuettes,lines',
     init: function( editor ) {
         var pluginDirectory = this.path;
 
@@ -143,6 +144,16 @@ CKEDITOR.plugins.add( 'lirecouleur', {
         });
         
         editor.addCommand( 'lc_syll_dys', {
+            exec: function( editor ) {
+                // indication de sélection de traitement
+                LireCouleurFormateur.selectTraitement(2);
+
+                // lecture du texte sélectionné
+                _formatElement( editor.element.$, 'sd' );
+            }
+        });
+
+        editor.addCommand( 'lc_syll', {
             exec: function( editor ) {
                 // indication de sélection de traitement
                 LireCouleurFormateur.selectTraitement(2);
@@ -210,16 +221,22 @@ CKEDITOR.plugins.add( 'lirecouleur', {
             toolbar: 'lirecouleur,4'
         });
         
+        editor.ui.addButton( 'Syll', {
+            label: 'Souligner les syllabes',
+            command: 'lc_syll',
+            toolbar: 'lirecouleur,5'
+        });
+        
         editor.ui.addButton( 'LMuettes', {
             label: 'Marquer les lettres muettes',
             command: 'lc_lmuettes',
-            toolbar: 'lirecouleur,5'
+            toolbar: 'lirecouleur,6'
         });
         
         editor.ui.addButton( 'Lines', {
             label: 'Marquer les lignes',
             command: 'lc_lignes',
-            toolbar: 'lirecouleur,6'
+            toolbar: 'lirecouleur,7'
         });
     }
 });
