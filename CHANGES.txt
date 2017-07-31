@@ -1,6 +1,12 @@
+------------------------- 3.6.0------------------------- 
 Correction :
 * prononciation de "sourcil" ou "persil" : le "l" final ne se prononce pas
 * correction d'un bug ligne 1450 pour éviter un plantage sur le décodage du mot "vieil"
+* correction de problèmes de compatibilités entre OpenOffice et LibreOffice
+
+Ajout :
+* nouvelle boite de dialogue pour permettre l'édition simple des styles de caractères
+* nouvelle fonction de surlignage alterné des mots
 
 ------------------------- 3.5.2------------------------- 
 
