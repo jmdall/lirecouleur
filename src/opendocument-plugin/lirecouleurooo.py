@@ -2822,18 +2822,23 @@ def __lirecouleur_separe_mots__(xDocument):
         xText = xTextR.getText()
         xWordCursor = xText.createTextCursorByRange(xTextR)
         xWordCursor.collapseToStart()
-        if not xWordCursor.isEndOfWord():
-            xWordCursor.gotoEndOfWord(False)
-        xWordCursor.collapseToEnd()
                     
-        while xText.compareRegionEnds(xWordCursor, xTextR) >= 0:
-            # mot par mot
-            if not xWordCursor.gotoNextWord(True):
-                break
-            xWordCursor.gotoStartOfWord(True)
-            setStyle(stylEspace, xWordCursor)
+        # placement au début du dernier mot du paragraphe
+        xTextR.collapseToEnd()
+        xTextR.gotoPreviousWord(False)
+        xTextR.gotoStartOfWord(False)
+        xTextR.collapseToStart()
 
-            xWordCursor.gotoEndOfWord(False)
+        while xText.compareRegionStarts(xWordCursor, xTextR) > 0:
+            # mot par mot
+            xWordCursor.gotoEndOfWord(True)
+            xWordCursor.collapseToEnd()
+            
+            if not xWordCursor.gotoNextWord(True):
+                return True
+            if not xWordCursor.gotoStartOfWord(True):
+                return True
+            setStyle(stylEspace, xWordCursor)
             xWordCursor.collapseToEnd()
 
     return True
@@ -2873,8 +2878,16 @@ def __lirecouleur_couleur_mots__(xDocument):
         xWordCursor = xText.createTextCursorByRange(xTextR)
         xWordCursor.collapseToStart()
         xWordCursor.gotoStartOfWord(False)
+        
+        # placement à la fin du dernier mot du paragraphe
+        xTextR.collapseToEnd()
+        xTextR.gotoPreviousWord(False)
+        xTextR.gotoStartOfWord(False)
+        xTextR.gotoEndOfWord(True)
                     
         while xText.compareRegionEnds(xWordCursor, xTextR) >= 0:
+            xWordCursor.collapseToStart()
+            xWordCursor.gotoStartOfWord(False)
             xWordCursor.gotoEndOfWord(True)
             setStyle(styles_mots['dys'][str(imot+1)], xWordCursor)
             imot = (imot + 1) % nb_altern 
@@ -2882,9 +2895,7 @@ def __lirecouleur_couleur_mots__(xDocument):
             # mot suivant
             xWordCursor.collapseToEnd()
             if not xWordCursor.gotoNextWord(False):
-                break
-            xWordCursor.collapseToStart()
-            xWordCursor.gotoStartOfWord(False)
+                return True
 
     return True
 
