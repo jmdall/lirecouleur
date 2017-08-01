@@ -33,7 +33,7 @@ import sys
 import os
 import gettext
 from gettext import gettext as _
-from com.sun.star.awt import XActionListener
+from com.sun.star.awt import (XWindowListener, XActionListener, XMouseListener)
 from com.sun.star.task import XJobExecutor
 from com.sun.star.task import XJob
 
@@ -502,6 +502,18 @@ __style_syll_dys__ = {
         '3': {'CharColor':0x0000ff00}
         }
 
+style_mot_dys = {
+        '1': {'CharStyleName':'mot_dys_1'},
+        '2': {'CharStyleName':'mot_dys_2'},
+        '3': {'CharStyleName':'mot_dys_3'}
+        }
+
+__style_mot_dys__ = {
+        '1': {'CharColor':0x000000ff},
+        '2': {'CharColor':0x00ff0000},
+        '3': {'CharColor':0x0000ff00}
+        }
+
 style_yod = {
         'a':{'CharStyleName':'yod_phon_a'},
         'q':{'CharStyleName':'yod_phon_e'},
@@ -586,6 +598,11 @@ styles_phonemes = {
 styles_syllabes = {
         'souligne' : style_syll_souligne,
         'dys' : style_syll_dys
+        }
+
+
+styles_mots = {
+        'dys' : style_mot_dys
         }
 
 ######################################################################################
@@ -725,6 +742,7 @@ def importStylesLireCouleur(xModel):
         createCharacterStyles(xModel, style_phon_perso, __style_phon_perso__)
         createCharacterStyles(xModel, style_phon_complexes, __style_phon_complexes__)
         createCharacterStyles(xModel, style_syll_dys, __style_syll_dys__)
+        createCharacterStyles(xModel, style_mot_dys, __style_mot_dys__)
         createCharacterStyles(xModel, styles_lignes_altern, __styles_lignes_altern__)
         createCharacterStyles(xModel, style_yod, __style_yod__)
         createCharacterStyles(xModel, style_wau, __style_wau__)
@@ -743,14 +761,13 @@ def importStylesLireCouleur(xModel):
 # Gestionnaire d'événement de la boite de dialogue
 ######################################################################################
 class MyActionListener(unohelper.Base, XActionListener):
-    def __init__(self, controlContainer, checkListPhonemes, fieldCoul, fieldEsp, checkPoint, checkDynsylldys,
+    def __init__(self, controlContainer, checkListPhonemes, fieldCoul, fieldEsp, checkPoint,
                     selectTyp1Syll, selectTyp2Syll, selectLoc, fieldTemp):
         self.controlContainer = controlContainer
         self.checkListPhonemes = checkListPhonemes
         self.fieldCoul = fieldCoul
         self.fieldEsp = fieldEsp
         self.checkPoint = checkPoint
-        self.checkDynsylldys = checkDynsylldys
         self.selectTyp1Syll = selectTyp1Syll
         self.selectTyp2Syll = selectTyp2Syll
         self.selectLocale = selectLoc
@@ -817,7 +834,6 @@ class MyActionListener(unohelper.Base, XActionListener):
         saveMaskAlternate(int(nbcouleurs))
         saveMaskSubspaces(int(nbespaces))
         saveMaskPoint(self.checkPoint.getState())
-        saveMaskDynSyllDys(self.checkDynsylldys.getState())
 
         saveMaskSyllo(self.selectTyp1Syll.getSelectedItemPos(), self.selectTyp2Syll.getSelectedItemPos())
         saveMaskTemplate(tempFilename)
@@ -892,6 +908,8 @@ def createCheckBox(dialogModel, px, py, name, index, label, etat, w=58):
     checkBP.TabIndex = index
     checkBP.State = etat
     checkBP.Label = label
+    dialogModel.insertByName(checkBP.Name, checkBP)
+
     return checkBP
 
 ######################################################################################
@@ -916,19 +934,19 @@ def createNumericField(dialogModel, px, py, name, index, val, w=20):
 ######################################################################################
 # Création d'une boite de dialogue pour sélectionner les phonèmes à visualiser
 ######################################################################################
-class SelectPhonemes(unohelper.Base, XJobExecutor):
+class GestionnaireConfiguration(unohelper.Base, XJobExecutor):
     """Ouvrir une fenêtre de dialogue pour sélectionner les phonèmes à visualiser."""
     def __init__(self, ctx):
         self.ctx = ctx
     def trigger(self, args):
         desktop = self.ctx.ServiceManager.createInstanceWithContext('com.sun.star.frame.Desktop', self.ctx)
-        __creerSelectPhonemesDialog__(desktop.getCurrentComponent(), self.ctx)
+        __gestionnaire_config_dialog__(desktop.getCurrentComponent(), self.ctx)
 
-def creerSelectPhonemesDialog( args=None ):
+def gestionnaire_config_dialog( args=None ):
     """Ouvrir une fenêtre de dialogue pour sélectionner les phonèmes à visualiser."""
-    __creerSelectPhonemesDialog__(XSCRIPTCONTEXT.getDocument(), XSCRIPTCONTEXT.getComponentContext())
+    __gestionnaire_config_dialog__(XSCRIPTCONTEXT.getDocument(), XSCRIPTCONTEXT.getComponentContext())
 
-def __creerSelectPhonemesDialog__(xDocument, xContext):
+def __gestionnaire_config_dialog__(xDocument, xContext):
     __arret_dynsylldys__(xDocument)
 
     """Ouvrir une fenêtre de dialogue pour sélectionner les phonèmes à visualiser."""
@@ -952,9 +970,6 @@ def __creerSelectPhonemesDialog__(xDocument, xContext):
     # lecture pour savoir s'il faut mettre un point sous les lettres muettes dans le fichier .lirecouleur
     selectpoint = handleMaskPoint()
 
-    # lecture de l'info sur le choix d'affichage des syllabes dynamiquement ou non dans le fichier .lirecouleur
-    selectdynsyldys = handleMaskDynSyllDys()
-
     # lecture pour savoir comment il faut afficher les syllabes dans le fichier .lirecouleur
     selectsyllo = handleMaskSyllo()
 
@@ -972,7 +987,7 @@ def __creerSelectPhonemesDialog__(xDocument, xContext):
     dialogModel.Width = 180
     dialogModel.Height = 284
     dialogModel.Title = _("Configuration LireCouleur")
-
+    
     # créer le label titre
     labelTitre = dialogModel.createInstance("com.sun.star.awt.UnoControlFixedTextModel")
     labelTitre.PositionX = 10
@@ -1068,7 +1083,7 @@ def __creerSelectPhonemesDialog__(xDocument, xContext):
 
     labelListLocale = dialogModel.createInstance("com.sun.star.awt.UnoControlFixedTextModel")
     labelListLocale.PositionX = 10
-    labelListLocale.PositionY = checkKS.PositionY+checkKS.Height+6
+    labelListLocale.PositionY = checkKS.PositionY+checkKS.Height+2
     labelListLocale.Width  = 50
     labelListLocale.Height = checkKS.Height
     labelListLocale.Name = "labelListLocale"
@@ -1077,9 +1092,9 @@ def __creerSelectPhonemesDialog__(xDocument, xContext):
 
     listLocale = dialogModel.createInstance("com.sun.star.awt.UnoControlListBoxModel")
     listLocale.PositionX = labelListLocale.PositionX+labelListLocale.Width
-    listLocale.PositionY = labelListLocale.PositionY-2
+    listLocale.PositionY = labelListLocale.PositionY
     listLocale.Width  = 50
-    listLocale.Height  = 12
+    listLocale.Height  = checkKS.Height
     listLocale.Name = "listLocale"
     listLocale.TabIndex = 1
     listLocale.Dropdown = True
@@ -1135,7 +1150,7 @@ def __creerSelectPhonemesDialog__(xDocument, xContext):
     sep1.PositionX = 2
     sep1.PositionY = listLocale.PositionY+listLocale.Height+2
     sep1.Width  = dialogModel.Width - 4
-    sep1.Height  = 2
+    sep1.Height  = 5
     sep1.Name = "sep1"
     sep1.TabIndex = 1
 
@@ -1167,21 +1182,17 @@ def __creerSelectPhonemesDialog__(xDocument, xContext):
     sep2.Name = "sep2"
     sep2.TabIndex = 1
 
-    checkPoint = createCheckBox(dialogModel, 8, sep2.PositionY+sep2.Height-2, "checkPoint", 0,
-                    _(u("Symboles sous phonèmes")), selectpoint, dialogModel.Width/2-4)
-
-    checkDynsylldys = createCheckBox(dialogModel, checkPoint.PositionX+checkPoint.Width+10,
-            checkPoint.PositionY, "checkDynsylldys", 0, _(u("Surligner syllabes")), selectdynsyldys,
-            dialogModel.Width-checkPoint.PositionX-checkPoint.Width-10)
+    checkPoint = createCheckBox(dialogModel, 10, sep2.PositionY+sep2.Height, "checkPoint", 0,
+                    _(u("Placer des symboles sous certains sons")), selectpoint, dialogModel.Width-10)
 
     labelRadio = dialogModel.createInstance("com.sun.star.awt.UnoControlFixedTextModel")
     labelRadio.PositionX = 10
-    labelRadio.PositionY = checkPoint.PositionY+checkPoint.Height+7
-    labelRadio.Width  = dialogModel.Width/2-30
+    labelRadio.PositionY = checkPoint.PositionY+checkPoint.Height+2
+    labelRadio.Width  = dialogModel.Width-100-12
     labelRadio.Height = 10
     labelRadio.Name = "labelRadio"
     labelRadio.TabIndex = 1
-    labelRadio.Label = _(u("Type des syllabes"))
+    labelRadio.Label = _(u("Souligner les syllabes"))
 
     listTyp1Syll = dialogModel.createInstance("com.sun.star.awt.UnoControlListBoxModel")
     listTyp1Syll.PositionX = labelRadio.PositionX+labelRadio.Width
@@ -1200,7 +1211,7 @@ def __creerSelectPhonemesDialog__(xDocument, xContext):
 
     listTyp2Syll = dialogModel.createInstance("com.sun.star.awt.UnoControlListBoxModel")
     listTyp2Syll.PositionX = listTyp1Syll.PositionX+listTyp1Syll.Width
-    listTyp2Syll.PositionY = labelRadio.PositionY-2
+    listTyp2Syll.PositionY = listTyp1Syll.PositionY
     listTyp2Syll.Width  = 50
     listTyp2Syll.Height  = listTyp1Syll.Height
     listTyp2Syll.Name = "listTyp2Syll"
@@ -1215,7 +1226,7 @@ def __creerSelectPhonemesDialog__(xDocument, xContext):
 
     sep3 = dialogModel.createInstance("com.sun.star.awt.UnoControlFixedLineModel")
     sep3.PositionX = sep1.PositionX
-    sep3.PositionY = listTyp2Syll.PositionY+listTyp2Syll.Height+2
+    sep3.PositionY = labelRadio.PositionY+labelRadio.Height+2
     sep3.Width  = sep1.Width
     sep3.Height  = sep1.Height
     sep3.Name = "sep3"
@@ -1262,50 +1273,7 @@ def __creerSelectPhonemesDialog__(xDocument, xContext):
     dialogModel.insertByName("sep1", sep1)
     dialogModel.insertByName("sep2", sep2)
     dialogModel.insertByName("sep3", sep3)
-    dialogModel.insertByName("checkA", checkA)
-    dialogModel.insertByName("checkE", checkE)
-    dialogModel.insertByName("checkEt", checkEt)
-    dialogModel.insertByName("checkQ", checkQ)
-    dialogModel.insertByName("checkI", checkI)
-    dialogModel.insertByName("checkU", checkU)
-    dialogModel.insertByName("checkY", checkY)
-    dialogModel.insertByName("checkO", checkO)
-    dialogModel.insertByName("checkEu", checkEu)
-    dialogModel.insertByName("checkAn", checkAn)
-    dialogModel.insertByName("checkIn", checkIn)
-    dialogModel.insertByName("checkOn", checkOn)
-    dialogModel.insertByName("checkW", checkW)
-    dialogModel.insertByName("checkJ", checkJ)
-    dialogModel.insertByName("checkN", checkN)
-    dialogModel.insertByName("checkNg", checkNg)
-    dialogModel.insertByName("checkGn", checkGn)
-    dialogModel.insertByName("checkH", checkH)
 
-    dialogModel.insertByName("checkL", checkL)
-    dialogModel.insertByName("checkM", checkM)
-    dialogModel.insertByName("checkR", checkR)
-
-    dialogModel.insertByName("checkV", checkV)
-    dialogModel.insertByName("checkZ", checkZ)
-    dialogModel.insertByName("checkGe", checkGe)
-
-    dialogModel.insertByName("checkF", checkF)
-    dialogModel.insertByName("checkS", checkS)
-    dialogModel.insertByName("checkCh", checkCh)
-
-    dialogModel.insertByName("checkP", checkP)
-    dialogModel.insertByName("checkT", checkT)
-    dialogModel.insertByName("checkK", checkK)
-
-    dialogModel.insertByName("checkB", checkB)
-    dialogModel.insertByName("checkD", checkD)
-    dialogModel.insertByName("checkG", checkG)
-
-    dialogModel.insertByName("checkKS", checkKS)
-    dialogModel.insertByName("checkGZ", checkGZ)
-
-    dialogModel.insertByName("checkPoint", checkPoint)
-    dialogModel.insertByName("checkDynsylldys", checkDynsylldys)
     dialogModel.insertByName(labelListLocale.Name, labelListLocale)
     dialogModel.insertByName(listLocale.Name, listLocale)
 
@@ -1328,7 +1296,6 @@ def __creerSelectPhonemesDialog__(xDocument, xContext):
                                 controlContainer.getControl("fieldCoul"),
                                 controlContainer.getControl("fieldEsp"),
                                 controlContainer.getControl("checkPoint"),
-                                controlContainer.getControl("checkDynsylldys"),
                                 controlContainer.getControl(listTyp1Syll.Name),
                                 controlContainer.getControl(listTyp2Syll.Name),
                                 controlContainer.getControl(listLocale.Name),
@@ -1450,19 +1417,19 @@ class DictRemActionListener(unohelper.Base, XActionListener):
             delLCDictEntry(self.listdictControl.getSelectedItem())
             self.listdict.removeItem(self.listdictControl.getSelectedItemPos())
 
-class GestionnaireDictionaire(unohelper.Base, XJobExecutor):
+class GestionnaireDictionnaire(unohelper.Base, XJobExecutor):
     """Ouvrir une fenêtre de dialogue pour gérer le dictionnaire des décodages spéciaux."""
     def __init__(self, ctx):
         self.ctx = ctx
     def trigger(self, args):
         desktop = self.ctx.ServiceManager.createInstanceWithContext('com.sun.star.frame.Desktop', self.ctx)
-        __gererDictionnaireDialog__(desktop.getCurrentComponent(), self.ctx)
+        __gestionnaire_dictionnaire_dialog__(desktop.getCurrentComponent(), self.ctx)
 
-def gererDictionnaireDialog( args=None ):
+def gestionnaire_dictionnaire_dialog( args=None ):
     """Ouvrir une fenêtre de dialogue pour gérer le dictionnaire des décodages spéciaux."""
-    __gererDictionnaireDialog__(XSCRIPTCONTEXT.getDocument(), XSCRIPTCONTEXT.getComponentContext())
+    __gestionnaire_dictionnaire_dialog__(XSCRIPTCONTEXT.getDocument(), XSCRIPTCONTEXT.getComponentContext())
 
-def __gererDictionnaireDialog__(xDocument, xContext):
+def __gestionnaire_dictionnaire_dialog__(xDocument, xContext):
     __arret_dynsylldys__(xDocument)
 
     """Ouvrir une fenêtre de dialogue pour gérer le dictionnaire des décodages spéciaux."""
@@ -1607,6 +1574,179 @@ def __gererDictionnaireDialog__(xDocument, xContext):
 
     controlContainer.setVisible(False);
     controlContainer.createPeer(toolkit, None);
+
+    # execute it
+    controlContainer.execute()
+
+    # dispose the dialog
+    controlContainer.dispose()
+
+class SelectStyleActionListener(unohelper.Base, XMouseListener):
+    """Gestionnaire d'événement : double-clic sur un élément de l'arbre des styles"""
+    def __init__(self, ctx, document):
+        self.ctx = ctx
+        self.document = document
+
+    def mouseEntered(self, aEvent): pass
+    def mouseExited(self, aEvent): pass
+    def mousePressed(self, aEvent):
+        try:
+            noeud = aEvent.Source.getNodeForLocation(aEvent.X, aEvent.Y)
+            phonstyle = noeud.DataValue
+            if not phonstyle is None and aEvent.ClickCount == 2 and aEvent.Buttons == 1:
+                ctx = uno.getCurrentContext()
+                dispatcher = self.ctx.ServiceManager.createInstanceWithContext( 'com.sun.star.frame.DispatchHelper', self.ctx)
+                prop1 = createUnoStruct("com.sun.star.beans.PropertyValue")
+                prop1.Name = 'Param'
+                prop1.Value = phonstyle
+                prop2 = createUnoStruct("com.sun.star.beans.PropertyValue")
+                prop2.Name = 'Family'
+                prop2.Value = 1
+                dispatcher.executeDispatch(self.document.getCurrentController().getFrame(), ".uno:EditStyle", "", 0, (prop1, 
+                prop2,))
+        except:
+            pass
+    def mouseReleased(self, aEvent): pass
+
+######################################################################################
+# Création d'une boite de dialogue pour sélectionner les phonèmes à visualiser
+######################################################################################
+class GestionnaireStyles(unohelper.Base, XJobExecutor, XMouseListener):
+    """Ouvrir une fenêtre de dialogue pour éditer les styles."""
+    def __init__(self, ctx):
+        self.ctx = ctx
+    def trigger(self, args):
+        desktop = self.ctx.ServiceManager.createInstanceWithContext('com.sun.star.frame.Desktop', self.ctx)
+        __gestionnaire_styles_dialog__(desktop.getCurrentComponent(), self.ctx)
+
+def gestionnaire_styles_dialog( args=None ):
+    """Ouvrir une fenêtre de dialogue pour sélectionner les phonèmes à visualiser."""
+    __gestionnaire_styles_dialog__(XSCRIPTCONTEXT.getDocument(), XSCRIPTCONTEXT.getComponentContext())
+
+def __gestionnaire_styles_dialog__(xDocument, xContext):
+    __arret_dynsylldys__(xDocument)
+
+    """Ouvrir une fenêtre de dialogue pour sélectionner les phonèmes à visualiser."""
+    import array
+
+    # i18n
+    i18n()
+
+    # get the service manager
+    smgr = xContext.ServiceManager
+
+    # create the dialog model and set the properties
+    dialogModel = smgr.createInstanceWithContext("com.sun.star.awt.UnoControlDialogModel", xContext)
+
+    dialogModel.PositionX = 100
+    dialogModel.PositionY = 50
+    dialogModel.Width = 150
+    dialogModel.Height = 200
+    dialogModel.Title = _(u("Edition des styles"))
+
+    # create the dialog control and set the model
+    controlContainer = smgr.createInstanceWithContext("com.sun.star.awt.UnoControlDialog", xContext);
+    controlContainer.setModel(dialogModel)
+
+    # create a peer
+    toolkit = smgr.createInstanceWithContext("com.sun.star.awt.ExtToolkit", xContext)
+
+    controlContainer.setVisible(False);
+    controlContainer.createPeer(toolkit, None);
+
+    treeModel = dialogModel.createInstance("com.sun.star.awt.tree.TreeControlModel")
+    treeModel.Name = 'treeModel'
+    treeModel.PositionX = 0
+    treeModel.PositionY = 0
+    treeModel.Width = 150
+    treeModel.Height = 200
+    dialogModel.insertByName(treeModel.Name, treeModel)
+    
+    mutableTreeDataModel = smgr.createInstanceWithContext("com.sun.star.awt.tree.MutableTreeDataModel", xContext)
+    rootNode = mutableTreeDataModel.createNode("Styles LireCouleur", True)
+    mutableTreeDataModel.setRoot(rootNode)
+
+    # styles phonèmes
+    noeudPhonemes = mutableTreeDataModel.createNode("Phonèmes", True)
+    rootNode.appendChild(noeudPhonemes)
+    
+    lphon_v = {'phon_a': u('[a] ta'), 'phon_e':u('[e] le'), 'phon_i':u('[i] il'), 'phon_u':u('[y] tu'),
+    'phon_ou':u('[u] fou'), 'phon_ez':u('[é] né'), 'phon_o_ouvert':u('[o] mot'), 'phon_et':u('[è] sel'),
+    'phon_an':u('[an] grand'), 'phon_on':u('[on] son'), 'phon_eu':u('[x] feu'), 'phon_in':u('[in] fin'),
+    'phon_un':u('[un] un'), 'phon_muet':u('[#] lettres muettes, e caduc')}
+    lphon_c = {'phon_r':u('[r] rat'), 'phon_l':u('[l] ville'),
+    'phon_m':u('[m] mami'), 'phon_n':u('[n] âne'), 'phon_v':u('[v] vélo'), 'phon_z':u('[z] zoo'),
+    'phon_ge':u('[ge] jupe'), 'phon_f':u('[f] effacer'), 'phon_s':u('[s] scie'), 'phon_ch':u('[ch] chat'),
+    'phon_p':u('[p] papa'), 'phon_t':u('[t] tortue'), 'phon_k':u('[k] coq'), 'phon_b':u('[b] bébé'),
+    'phon_d':u('[d] dindon'), 'phon_g':u('[g] gare'), 'phon_ks':u('[ks] ksi'), 'phon_gz':u('[gz] exact')}
+    lphon_s = {'phon_w':u('[w]'), 'phon_wa':u('[wa] noix'), 'phon_w5':u('[w5] coin'),
+    'phon_y':u('[j] fille'), 'phon_ng':u('[ng] parking'), 'phon_gn':u('[gn] ligne')}
+    lphon_x = {'phon_voyelle_comp':u('voyelle complexe'), 'phon_consonne_comp':u('consonne complexe')}
+    noeudcat = mutableTreeDataModel.createNode("Voyelles", True)
+    noeudPhonemes.appendChild(noeudcat)
+    for ph in lphon_v:
+        noeud = mutableTreeDataModel.createNode(lphon_v[ph], False)
+        noeud.DataValue = ph
+        noeudcat.appendChild(noeud)
+    noeudcat = mutableTreeDataModel.createNode("Consonnes", True)
+    noeudPhonemes.appendChild(noeudcat)
+    for ph in lphon_c:
+        noeud = mutableTreeDataModel.createNode(lphon_c[ph], False)
+        noeud.DataValue = ph
+        noeudcat.appendChild(noeud)
+    noeudcat = mutableTreeDataModel.createNode("Semi-consonnes", True)
+    noeudPhonemes.appendChild(noeudcat)
+    for ph in lphon_s:
+        noeud = mutableTreeDataModel.createNode(lphon_s[ph], False)
+        noeud.DataValue = ph
+        noeudcat.appendChild(noeud)
+    noeudcat = mutableTreeDataModel.createNode("Complexes", True)
+    noeudPhonemes.appendChild(noeudcat)
+    for ph in lphon_x:
+        noeud = mutableTreeDataModel.createNode(lphon_x[ph], False)
+        noeud.DataValue = ph
+        noeudcat.appendChild(noeud)
+
+    # styles syllabes
+    noeudSyllabes = mutableTreeDataModel.createNode("Syllabes", True)
+    rootNode.appendChild(noeudSyllabes)
+    for i in range(4):
+        noeud = mutableTreeDataModel.createNode('syllabe '+str(i+1), False)
+        noeud.DataValue = 'syll_dys_'+str(i+1)
+        noeudSyllabes.appendChild(noeud)
+    
+    # styles mots
+    noeudMots = mutableTreeDataModel.createNode("Mots", True)
+    rootNode.appendChild(noeudMots)
+    for i in range(4):
+        noeud = mutableTreeDataModel.createNode('mot '+str(i+1), False)
+        noeud.DataValue = 'mot_dys_'+str(i+1)
+        noeudMots.appendChild(noeud)
+    noeud = mutableTreeDataModel.createNode('liaison', False)
+    noeud.DataValue = 'liaison'
+    noeudMots.appendChild(noeud)
+
+    # styles lettres
+    lphon_x = {'lettre_b':'b', 'lettre_d':'d', 'lettre_p':'p', 'lettre_q':'q',
+                'Majuscule':'majuscule', 'Ponctuation':'ponctuation'}
+    noeudLettres = mutableTreeDataModel.createNode("Lettres", True)
+    rootNode.appendChild(noeudLettres)
+    for ph in lphon_x:
+        noeud = mutableTreeDataModel.createNode(lphon_x[ph], False)
+        noeud.DataValue = ph
+        noeudLettres.appendChild(noeud)
+    
+    # styles lignes
+    noeudLignes = mutableTreeDataModel.createNode("Lignes", False)
+    rootNode.appendChild(noeudLignes)
+    for i in range(4):
+        noeud = mutableTreeDataModel.createNode('ligne '+str(i+1), False)
+        noeud.DataValue = 'altern_ligne_'+str(i+1)
+        noeudLignes.appendChild(noeud)
+
+    treeModel.DataModel = mutableTreeDataModel
+    treeCtrl = controlContainer.getControl(treeModel.Name)
+    treeCtrl.addMouseListener(SelectStyleActionListener(xContext, xDocument))
 
     # execute it
     controlContainer.execute()
@@ -2015,7 +2155,7 @@ def segmenteParagraphe(xCursor):
     del xtr_p
     return lCursors
 
-def getXTextRange(xDocument, mode=0):
+def getXTextRange(xDocument, fonction='mot', mode=0):
     """
         Récupère le textRange correspondant au mot sous le curseur ou à la sélection
         mode = 0 : récupère le bloc de texte sélectionné
@@ -2049,13 +2189,35 @@ def getXTextRange(xDocument, mode=0):
     xText = xTextRange.getText() ## get the XText interface
 
     if len(theString)==0:
-        # pas de texte sélectionné, il faut chercher le mot positionné sous le curseur
+        # pas de texte sélectionné, il faut chercher le mot ou le paragraphe positionné sous le curseur
         try:
-            xWordCursor = xText.createTextCursorByRange(xTextRange)
-            if not xWordCursor.isStartOfWord():
-                xWordCursor.gotoStartOfWord(False)
-            xWordCursor.gotoEndOfWord(True)
-            xTextRanges.append(xWordCursor)
+            if fonction == 'mot':
+                # sélection du mot courant
+                xWordCursor = xText.createTextCursorByRange(xTextRange)
+                if not xWordCursor.isStartOfWord():
+                    xWordCursor.gotoStartOfWord(False)
+                xWordCursor.gotoEndOfWord(True)
+                xTextRanges.append(xWordCursor)
+            elif fonction == 'paragraphe':
+                # sélection du paragraphe courant
+                xCursor = xText.createTextCursorByRange(xTextRange)
+                if not xCursor.isStartOfParagraph():
+                    xCursor.gotoStartOfParagraph(False)
+                xCursor.gotoEndOfParagraph(True)
+                xTextRanges.append(xCursor)
+            elif fonction == 'phrase':
+                # sélection de la phrase courante
+                xCursor = xText.createTextCursorByRange(xTextRange)
+                if not xCursor.isStartOfSentence():
+                    xCursor.gotoStartOfSentence(False)
+                xCursor.gotoEndOfSentence(True)
+                xTextRanges.append(xCursor)
+            else:
+                # sélection de tout le texte
+                xCursor = xText.createTextCursorByRange(xDocument.getText())
+                xCursor.gotoStart(False)
+                xCursor.gotoEnd(True)
+                xTextRanges.append(xCursor)
         except:
             pass
         return xTextRanges
@@ -2533,7 +2695,7 @@ def __lirecouleur_defaut__(xDocument, choix='defaut'):
 
     """Applique le style par défaut à la sélection"""
     try:
-        xTextRange = getXTextRange(xDocument, mode=0)
+        xTextRange = getXTextRange(xDocument, fonction='paragraphe', mode=0)
         if xTextRange == None:
             return False
         for xtr in xTextRange:
@@ -2582,7 +2744,7 @@ def __lirecouleur_espace__(xDocument):
 
     """Espace les mots de la sélection"""
     try:
-        xTextRange = getXTextRange(xDocument, mode=0)
+        xTextRange = getXTextRange(xDocument, fonction='paragraphe', mode=0)
         if xTextRange == None:
             return False
 
@@ -2648,28 +2810,31 @@ def __lirecouleur_separe_mots__(xDocument):
     __arret_dynsylldys__(xDocument)
 
     """Sépare les mots de la sélection en coloriant les espaces"""
-    xSelectionSupplier = xDocument.getCurrentController()
-    xIndexAccess = xSelectionSupplier.getSelection()
-    xTextRange = xIndexAccess.getByIndex(0)
-    if xTextRange is None or len(xTextRange.getString()) == 0:
-        return
+    xTextRange = getXTextRange(xDocument, fonction='phrase', mode=0)
+    if xTextRange == None:
+        return False
 
     # Importer les styles de coloriage de texte
     importStylesLireCouleur(xDocument)
     stylEspace = styles_phonemes['perso']['espace']
 
-    xText = xTextRange.getText()
-    xWordCursor = xText.createTextCursorByRange(xTextRange)
-    if not xWordCursor.isEndOfWord():
-        xWordCursor.gotoEndOfWord(False)
-                
-    while xText.compareRegionEnds(xWordCursor, xTextRange) >= 0:
-        # mot par mot
-        if not xWordCursor.gotoNextWord(True):
-            break
-        setStyle(stylEspace, xWordCursor)
+    for xTextR in xTextRange:
+        xText = xTextR.getText()
+        xWordCursor = xText.createTextCursorByRange(xTextR)
+        xWordCursor.collapseToStart()
+        if not xWordCursor.isEndOfWord():
+            xWordCursor.gotoEndOfWord(False)
+        xWordCursor.collapseToEnd()
+                    
+        while xText.compareRegionEnds(xWordCursor, xTextR) >= 0:
+            # mot par mot
+            if not xWordCursor.gotoNextWord(True):
+                break
+            xWordCursor.gotoStartOfWord(True)
+            setStyle(stylEspace, xWordCursor)
 
-        xWordCursor.gotoEndOfWord(False)
+            xWordCursor.gotoEndOfWord(False)
+            xWordCursor.collapseToEnd()
 
     return True
 
@@ -2691,12 +2856,10 @@ def lirecouleur_couleur_mots( args=None ):
 def __lirecouleur_couleur_mots__(xDocument):
     __arret_dynsylldys__(xDocument)
 
-    """Colorie les mots en alternant les couleurs (comme syll_dys)"""
-    xSelectionSupplier = xDocument.getCurrentController()
-    xIndexAccess = xSelectionSupplier.getSelection()
-    xTextRange = xIndexAccess.getByIndex(0)
-    if xTextRange is None or len(xTextRange.getString()) == 0:
-        return
+    """Sépare les mots de la sélection en coloriant les espaces"""
+    xTextRange = getXTextRange(xDocument, fonction='paragraphe', mode=0)
+    if xTextRange == None:
+        return False
 
     # Importer les styles de coloriage de texte
     importStylesLireCouleur(xDocument)
@@ -2704,24 +2867,24 @@ def __lirecouleur_couleur_mots__(xDocument):
     # récup de la période d'alternance des couleurs
     nb_altern = handleMaskAlternate()
 
-    xText = xTextRange.getText()
-    xWordCursor = xText.createTextCursorByRange(xTextRange)
-    if not xWordCursor.isStartOfWord():
-        xWordCursor.gotoStartOfWord(False)
-    xWordCursor.collapseToStart();
-    
     imot = 0
-    while xText.compareRegionEnds(xWordCursor, xTextRange) >= 0:
-        # mot par mot
-        xWordCursor.gotoEndOfWord(True)
-        setStyle(styles_syllabes['dys'][str(imot+1)], xWordCursor)
-
-        imot += 1
-        imot = imot%nb_altern
-
-        # mot suivant
-        if not xWordCursor.gotoNextWord(False):
-            break
+    for xTextR in xTextRange:
+        xText = xTextR.getText()
+        xWordCursor = xText.createTextCursorByRange(xTextR)
+        xWordCursor.collapseToStart()
+        xWordCursor.gotoStartOfWord(False)
+                    
+        while xText.compareRegionEnds(xWordCursor, xTextR) >= 0:
+            xWordCursor.gotoEndOfWord(True)
+            setStyle(styles_mots['dys'][str(imot+1)], xWordCursor)
+            imot = (imot + 1) % nb_altern 
+            
+            # mot suivant
+            xWordCursor.collapseToEnd()
+            if not xWordCursor.gotoNextWord(False):
+                break
+            xWordCursor.collapseToStart()
+            xWordCursor.gotoStartOfWord(False)
 
     return True
 
@@ -2744,7 +2907,7 @@ def __lirecouleur_espace_lignes__(xDocument):
     __arret_dynsylldys__(xDocument)
 
     try:
-        xTextRange = getXTextRange(xDocument, mode=0)
+        xTextRange = getXTextRange(xDocument, fonction='paragraphe', mode=0)
         if xTextRange == None:
             return False
         
@@ -2779,7 +2942,7 @@ def __lirecouleur_large__(xDocument):
     __lirecouleur_espace__(xDocument)
 
     try:
-        xTextRange = getXTextRange(xDocument, mode=0)
+        xTextRange = getXTextRange(xDocument, fonction='paragraphe', mode=0)
         if xTextRange == None:
             return False
         
@@ -2823,7 +2986,7 @@ def __lirecouleur_extra_large__(xDocument):
     __lirecouleur_large__(xDocument)
 
     try:
-        xTextRange = getXTextRange(xDocument, mode=0)
+        xTextRange = getXTextRange(xDocument, fonction='paragraphe', mode=0)
         if xTextRange == None:
             return False
         
@@ -2860,7 +3023,7 @@ def __lirecouleur_phonemes__(xDocument):
 
     __lirecouleur_defaut__(xDocument, 'noir')
 
-    xTextRange = getXTextRange(xDocument, mode=3)
+    xTextRange = getXTextRange(xDocument, fonction='mot', mode=3)
     if xTextRange == None:
         return False
 
@@ -2893,7 +3056,7 @@ def __lirecouleur_phonemes_complexes__(xDocument):
 
     """Colorie les phonèmes complexes"""
 
-    xTextRange = getXTextRange(xDocument, mode=3)
+    xTextRange = getXTextRange(xDocument, fonction='mot', mode=3)
     if xTextRange == None:
         return False
 
@@ -2946,7 +3109,7 @@ def __lirecouleur_syllabes__(xDocument, style = 'souligne'):
 
     """Mise en évidence des syllabes soulignées"""
     try:
-        xTextRange = getXTextRange(xDocument, mode=1)
+        xTextRange = getXTextRange(xDocument, fonction='mot', mode=1)
         if xTextRange == None:
             return False
 
@@ -2983,7 +3146,7 @@ def __lirecouleur_suppr_syllabes__(xDocument):
     __arret_dynsylldys__(xDocument)
 
     try:
-        xTextRange = getXTextRange(xDocument, mode=3)
+        xTextRange = getXTextRange(xDocument, fonction='mot', mode=3)
         if xTextRange == None:
             return False
         for xtr in xTextRange:
@@ -3014,7 +3177,7 @@ def __lirecouleur_l_muettes__(xDocument):
 
     """Met uniquement en évidence les lettres muettes"""
     try:
-        xTextRange = getXTextRange(xDocument, mode=1)
+        xTextRange = getXTextRange(xDocument, fonction='mot', mode=1)
         if xTextRange == None:
             return False
 
@@ -3118,7 +3281,7 @@ def __lirecouleur_phrase__(xDocument):
 
     """Marque les majuscules de début de phrase et les points de fin de phrase."""
     try:
-        xTextRange = getXTextRange(xDocument, mode=2)
+        xTextRange = getXTextRange(xDocument, fonction='phrase', mode=2)
         if xTextRange == None:
             return False
         for xtr in xTextRange:
@@ -3160,7 +3323,12 @@ def __lirecouleur_liaisons__(xDocument, forcer=False):
     __arret_dynsylldys__(xDocument)
 
     """Mise en évidence des liaisons"""
-    xTextRange = getXTextRange(xDocument, mode=1)
+    
+    # Commencer par espacer les mots du texte
+    __lirecouleur_espace__(xDocument)
+    
+    # Mettre les liaisons en évidence
+    xTextRange = getXTextRange(xDocument, fonction='paragraphe', mode=1)
     if xTextRange == None:
         return False
     for xtr in xTextRange:
@@ -3192,7 +3360,7 @@ def __lirecouleur_bdpq__(xDocument):
 
     """Colorie les lettres B, D, P, Q pour éviter les confusions"""
     try:
-        xTextRange = getXTextRange(xDocument, mode=1)
+        xTextRange = getXTextRange(xDocument, fonction='paragraphe', mode=1)
         if xTextRange == None:
             return False
         for xtr in xTextRange:
@@ -3224,7 +3392,7 @@ def __lirecouleur_consonne_voyelle__(xDocument):
 
     """Colorie les consonnes et les voyelles"""
     try:
-        xTextRange = getXTextRange(xDocument, mode=1)
+        xTextRange = getXTextRange(xDocument, fonction='paragraphe', mode=1)
         if xTextRange == None:
             return False
         for xtr in xTextRange:
@@ -3255,7 +3423,7 @@ def __lirecouleur_lignes__(xDocument):
     xIndexAccess = xSelectionSupplier.getSelection()
     xTextRange = xIndexAccess.getByIndex(0)
     if xTextRange is None or len(xTextRange.getString()) == 0:
-        return
+        xTextRange = getXTextRange(xDocument, fonction='texte', mode=0)[0]
 
     # Importer les styles de coloriage de texte
     importStylesLireCouleur(xDocument)
@@ -3264,32 +3432,39 @@ def __lirecouleur_lignes__(xDocument):
     nb_altern = handleMaskAlternate()
 
     xText = xTextRange.getText()
-    xtr = xText.createTextCursorByRange(xTextRange)
-    xtr_p = xSelectionSupplier.getViewCursor()
-    xtr_p.gotoRange(xTextRange, False)
-    xtr_p.gotoStartOfLine(False)
-    stylignes = [dict([['CharStyleName',styles_lignes+str(i)]]) for i in range(1,nb_altern+1)]
+    xCursPara = xText.createTextCursorByRange(xTextRange)
+    
+    xCursLi = xSelectionSupplier.getViewCursor()
+    xCursLi.gotoRange(xTextRange, False)
+    xCursLi.collapseToStart()
+    xCursLi.gotoStartOfLine(False)
+    stylignes = [dict([['CharStyleName',styles_lignes+str(i+1)]]) for i in range(nb_altern)]
     nligne = 0
 
-    while xText.compareRegionEnds(xtr_p, xTextRange) >= 0:
+    while xText.compareRegionEnds(xCursLi, xTextRange) >= 0:
         # paragraphe par paragraphe
-        xtr.gotoEndOfParagraph(False)
-        while xText.compareRegionEnds(xtr_p, xtr) >= 0:
+        xCursPara.gotoEndOfParagraph(False)
+        while xText.compareRegionEnds(xCursLi, xCursPara) >= 0:
             # ligne par ligne
-            xtr_p.gotoEndOfLine(True)
-            setStyle(stylignes[nligne], xtr_p)
-            ll = u(xtr_p.getString())
+            xCursLi.gotoStartOfLine(False)
+            xCursLi.gotoEndOfLine(True)
+            setStyle(stylignes[nligne], xCursLi)
+            ll = u(xCursLi.getString())
 
+            # fait pour éviter de changer de couleur de ligne lorsqu'une ligne est vide
             if len(ll.encode('UTF-8')) > 0:
                 nligne = (nligne + 1) % nb_altern
 
-            xtr_p.collapseToStart()
-            if not xtr_p.goDown(1, False):
-                del xtr
+            # retour au début de ligne et passage à la ligne suivante
+            xCursLi.collapseToStart()
+            if not xCursLi.goDown(1, False):
+                del xCursPara
                 return True
-        if not xtr.gotoNextParagraph(False):
-            del xtr
+            
+        if not xCursPara.gotoNextParagraph(False):
+            del xCursPara
             return True
+
     return True
 
 def lirecouleur_lignes( args=None ):
@@ -3496,10 +3671,6 @@ class LireCouleurHandler(unohelper.Base, XKeyHandler):
 ###################################################################################
 def __lirecouleur_dynsylldys__(xDocument):
     """Mise en évidence des syllabes soulignées dynamiquement"""
-    
-    choix_dynsylldys = handleMaskDynSyllDys()
-    if not choix_dynsylldys:
-        return
 
     oConfigProvider = createUnoService('com.sun.star.configuration.ConfigurationProvider')
     ppp = createUnoStruct("com.sun.star.beans.PropertyValue")
@@ -3526,10 +3697,6 @@ def __lirecouleur_dynsylldys__(xDocument):
 
 def __arret_dynsylldys__(xDocument):
     """Arrêt de la mise en évidence des syllabes soulignées dynamiquement"""
-    choix_dynsylldys = handleMaskDynSyllDys()
-    if not choix_dynsylldys:
-        return
-
     try:
         global __memoKeys__
         key = xDocument.RuntimeUID
@@ -3551,12 +3718,12 @@ def __arret_dynsylldys__(xDocument):
 # lists the scripts, that shall be visible inside OOo. Can be omitted.
 ###################################################################################
 g_exportedScripts = lirecouleur_defaut, lirecouleur_espace, lirecouleur_phonemes, lirecouleur_syllabes, \
-lirecouleur_sylldys, lirecouleur_l_muettes, creerSelectPhonemesDialog, lirecouleur_liaisons, \
+lirecouleur_sylldys, lirecouleur_l_muettes, gestionnaire_config_dialog, lirecouleur_liaisons, \
 lirecouleur_liaisons_forcees, lirecouleur_bdpq, lirecouleur_suppr_syllabes, lirecouleur_lignes, \
 lirecouleur_phrase, lirecouleur_suppr_decos, lirecouleur_phon_muet, lirecouleur_phonemes_complexes, \
-new_lirecouleur_document, gererDictionnaireDialog, lirecouleur_espace_lignes, lirecouleur_consonne_voyelle, \
+new_lirecouleur_document, gestionnaire_dictionnaire_dialog, lirecouleur_espace_lignes, lirecouleur_consonne_voyelle, \
 lirecouleur_large, lirecouleur_extra_large, lirecouleur_noir, lirecouleur_separe_mots, \
-lirecouleur_couleur_mots,
+lirecouleur_couleur_mots, gestionnaire_styles_dialog,
 
 # --- faked component, dummy to allow registration with unopkg, no functionality expected
 g_ImplementationHelper = unohelper.ImplementationHelper()
@@ -3606,7 +3773,7 @@ g_ImplementationHelper.addImplementation( \
     ('com.sun.star.task.Job',))
 
 g_ImplementationHelper.addImplementation( \
-    SelectPhonemes,'org.lirecouleur.SelectPhonemes', \
+    GestionnaireConfiguration,'org.lirecouleur.GestionnaireConfiguration', \
     ('com.sun.star.task.Job',))
 
 g_ImplementationHelper.addImplementation( \
@@ -3638,7 +3805,11 @@ g_ImplementationHelper.addImplementation( \
     ('com.sun.star.task.Job',))
 
 g_ImplementationHelper.addImplementation( \
-    GestionnaireDictionaire,'org.lirecouleur.GestionnaireDictionaire', \
+    GestionnaireDictionnaire,'org.lirecouleur.GestionnaireDictionnaire', \
+    ('com.sun.star.task.Job',))
+
+g_ImplementationHelper.addImplementation( \
+    GestionnaireStyles,'org.lirecouleur.GestionnaireStyles', \
     ('com.sun.star.task.Job',))
 
 g_ImplementationHelper.addImplementation( \
