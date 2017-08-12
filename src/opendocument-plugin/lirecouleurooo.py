@@ -2807,8 +2807,6 @@ def lirecouleur_separe_mots( args=None ):
     __lirecouleur_separe_mots__(XSCRIPTCONTEXT.getDocument())
 
 def __lirecouleur_separe_mots__(xDocument):
-    __arret_dynsylldys__(xDocument)
-
     """Sépare les mots de la sélection en coloriant les espaces"""
     xTextRange = getXTextRange(xDocument, fonction='phrase', mode=0)
     if xTextRange == None:
@@ -2829,17 +2827,22 @@ def __lirecouleur_separe_mots__(xDocument):
         xTextR.gotoStartOfWord(False)
         xTextR.collapseToStart()
 
-        while xText.compareRegionStarts(xWordCursor, xTextR) > 0:
+        i = 0
+        while xText.compareRegionStarts(xWordCursor, xTextR) > 0 and i < 10000:
             # mot par mot
             xWordCursor.gotoEndOfWord(True)
             xWordCursor.collapseToEnd()
             
             if not xWordCursor.gotoNextWord(True):
                 return True
+            if xWordCursor.isEndOfParagraph():
+                xWordCursor.gotoNextParagraph(False)
             if not xWordCursor.gotoStartOfWord(True):
                 return True
+
             setStyle(stylEspace, xWordCursor)
             xWordCursor.collapseToEnd()
+            i += 1
 
     return True
 
@@ -2870,7 +2873,8 @@ def __lirecouleur_couleur_mots__(xDocument):
     importStylesLireCouleur(xDocument)
 
     # récup de la période d'alternance des couleurs
-    nb_altern = handleMaskAlternate()
+    settings = Settings()
+    nb_altern = settings.get('__alternate__')
 
     imot = 0
     for xTextR in xTextRange:
@@ -2884,8 +2888,9 @@ def __lirecouleur_couleur_mots__(xDocument):
         xTextR.gotoPreviousWord(False)
         xTextR.gotoStartOfWord(False)
         xTextR.gotoEndOfWord(True)
-                    
-        while xText.compareRegionEnds(xWordCursor, xTextR) >= 0:
+        
+        i = 0
+        while xText.compareRegionEnds(xWordCursor, xTextR) >= 0 and i < 10000:
             xWordCursor.collapseToStart()
             xWordCursor.gotoStartOfWord(False)
             xWordCursor.gotoEndOfWord(True)
@@ -2896,6 +2901,9 @@ def __lirecouleur_couleur_mots__(xDocument):
             xWordCursor.collapseToEnd()
             if not xWordCursor.gotoNextWord(False):
                 return True
+            if xWordCursor.isEndOfParagraph():
+                xWordCursor.gotoNextParagraph(False)
+            i += 1
 
     return True
 

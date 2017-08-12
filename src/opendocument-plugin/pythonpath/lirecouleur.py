@@ -1587,14 +1587,8 @@ def extraire_syllabes_util(phonemes, mode=(ConstLireCouleur.SYLLABES_LC, ConstLi
                     sylls.append(cur_syl)
                     i += 1
 
-                # recomposer les syllabes avec les lettres
-                lsylls = [''.join([phonemes[i][1] for i in sylls[j]]) for j in range(len(sylls))]
-
-                # ménage
-                del sylls
-
-                logging.info('--------------------'+str(lsylls)+'--------------------')
-                return lsylls, [ph for ph in phonemes]
+                logging.info('--------------------'+str(sylls)+'--------------------')
+                return sylls, [ph for ph in phonemes]
 
     """ Le mot n'est dans le dictionnaire et le décodage est standard """
     nphonemes = []

@@ -330,7 +330,7 @@
 										<value xml:lang="en">LireCouleur Dictionary</value>
 									</prop>
 									<prop oor:name="URL" oor:type="xs:string">
-										<value>service:org.lirecouleur.GestionnaireDictionaire</value>
+										<value>service:org.lirecouleur.GestionnaireDictionnaire</value>
 									</prop>
 									<prop oor:name="Target" oor:type="xs:string">
 										<value>_self</value>
@@ -797,7 +797,7 @@
 			</node>
 			<node oor:name="org.lirecouleur.img18" oor:op="replace">
 				<prop oor:name="URL" oor:type="xs:string">
-					<value>service:org.lirecouleur.GestionnaireDictionaire</value>
+					<value>service:org.lirecouleur.GestionnaireDictionnaire</value>
 				</prop>
 				<node oor:name="UserDefinedImages">
 					<prop oor:name="ImageSmallURL" oor:type="xs:string">
